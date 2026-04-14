@@ -20,11 +20,8 @@
     </div>
     
     <nav class="apple-nav-links">
-      <button onclick="showPage('home')" class="apple-nav-item">כתבות</button>
-      <button onclick="showPage('store')" class="apple-nav-item">חנות תוכנות</button>
-      <button onclick="showPage('pdf-store')" class="apple-nav-item">חנות וקבצי PDF</button>
-
-      <button onclick="showPage('appointments')" class="apple-nav-item">קביעת תור</button>
+      <button onclick="showPage('pdf-store')" class="apple-nav-item">תמונות גולשים</button>
+      <button onclick="showPage('home')" class="apple-nav-item">סיפורים</button>
 
       <button id="theme-toggle" onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-right:16px; padding:8px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.3s; width:40px; height:40px;">🌓</button>
       
@@ -68,68 +65,10 @@
   </div>
 </div>
 
-<!-- APPOINTMENTS PAGE -->
-<div id="page-appointments" class="page" style="max-width: 800px; padding-top: 40px; margin: 0 auto;">
-  <div class="sidebar-card" style="background:#fff; border-radius:18px; border:1px solid var(--border-subtle); padding:40px; box-shadow:var(--shadow-soft);">
-    <h2 style="font-size:2rem; font-weight:800; margin-bottom:32px; display:flex; align-items:center; gap:12px;">📅 קביעת תור</h2>
-    
-    <div id="booking-main-container">
-      <div id="booking-form-view">
-        <div class="booking-widget">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
-            <div style="text-align:right;">
-              <label style="display:block; font-size:0.85rem; font-weight:700; color:#86868b; margin-bottom:8px;">1. בחר יום:</label>
-              <select id="book-day" onchange="initBookingWidget()" style="width:100%; padding:14px; border-radius:12px; border:1px solid #d2d2d7; font-size: 1rem; outline:none; background:#fbfbfd;">
-                <option>ראשון</option><option>שני</option><option>שלישי</option><option>רביעי</option><option>חמישי</option><option>שישי</option><option>שבת</option>
-              </select>
-            </div>
-            <div style="text-align:right;">
-              <label style="display:block; font-size:0.85rem; font-weight:700; color:#86868b; margin-bottom:8px;">2. בחר שעה:</label>
-              <div id="book-time-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:8px; max-height:100px; overflow-y:auto; padding:4px;"></div>
-            </div>
-          </div>
-
-          <div style="border-top: 1px solid #f2f2f2; padding-top:32px; margin-top:32px;">
-            <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:20px; color:#1d1d1f;">3. פרטי זיהוי וחזרה:</h3>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
-              <div style="text-align: right;">
-                <label style="display:block; font-size:0.9rem; font-weight:700; margin-bottom:8px; color: #1d1d1f;">שם מלא</label>
-                <input type="text" id="book-name-direct" required class="admin-input" placeholder="הכנס את שמך" style="width:100%; border-radius:12px; border:1px solid #d2d2d7; padding:12px;">
-              </div>
-              <div style="text-align: right;">
-                <label style="display:block; font-size:0.9rem; font-weight:700; margin-bottom:8px; color: #1d1d1f;">מספר טלפון</label>
-                <input type="tel" id="book-phone-direct" required class="admin-input" placeholder="הכנס מספר טלפון לחזרה" style="width:100%; border-radius:12px; border:1px solid #d2d2d7; padding:12px;">
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 32px; text-align: right;">
-              <label style="display:block; font-size:0.9rem; font-weight:700; margin-bottom:8px; color: #1d1d1f;">בקשה מיוחדת (אופציונלי)</label>
-              <textarea id="book-request-direct" class="admin-input" placeholder="מה תרצה שנדע?..." style="width:100%; border-radius:12px; border:1px solid #d2d2d7; padding:12px; font-family:inherit; min-height:80px; resize:none; outline:none;"></textarea>
-            </div>
-            
-            <button class="btn-primary" style="width:100%; padding: 18px; font-size: 1.2rem; font-weight:700; height:auto; border-radius:14px;" onclick="submitBookingDirect()">✅ קבע תור עכשיו</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- SUCCESS VIEW -->
-      <div id="booking-success-view" style="display: none; text-align: center; padding: 40px 0; animation: fadeIn 0.5s ease-out;">
-        <div style="font-size: 5rem; margin-bottom: 24px;">✅</div>
-        <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 12px; letter-spacing: -0.02em;">התור נקבע בהצלחה!</h2>
-        <p style="color: #86868b; font-size: 1.15rem; margin-bottom: 40px; font-weight: 500;">בוצע בהצלחה. ניצור איתך קשר בהקדם לאישור סופי.</p>
-        <button class="btn-secondary" onclick="resetBookingView()" style="padding: 14px 32px; border-radius: 980px; font-weight: 700;">➕ קבע תור נוסף</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- PDF STORE PAGE -->
 <div id="page-pdf-store" class="page" style="max-width: 1280px; padding-top: 40px;">
-  <div style="text-align: right; margin-bottom: 40px; padding: 0 24px;">
-    <h2 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px;">📚 חנות וקבצי PDF</h2>
-    <p style="color: #86868b; font-size: 1.1rem;">קבצים, מדריכים ותוכנות להורדה מיידית</p>
-  </div>
+    <h2 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px;">תמונות גולשים</h2>
   <div id="pdf-store-grid" class="pdf-store-grid">
     <!-- Populated by JS -->
   </div>
@@ -137,31 +76,57 @@
   <!-- User Upload Section (PDF Store) -->
   <div id="user-pdf-upload-section" style="margin-top: 60px; padding: 32px; background: #fff; border-radius: 24px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); max-width: 600px; margin-left: auto; margin-right: auto;">
     <div style="text-align: center; margin-bottom: 32px;">
-      <div style="width: 56px; height: 56px; background: rgba(0, 113, 227, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 16px;">📤</div>
-      <h2 style="font-size: 1.8rem; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 6px;">יש לך מוצר או קובץ למכור?</h2>
-      <p style="color: #86868b; font-size: 1rem; font-weight: 500;">העלה את הקובץ שלך לחנות בשניות.</p>
+      <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">העלה תמונות גולשים</h2>
     </div>
 
-    <div class="form-grid" style="max-width: 800px; margin: 0 auto;">
-      <div class="form-group full">
-        <label>שם הפריט / כותרת</label>
-        <input type="text" id="user-pdf-title">
-      </div>
-      <div class="form-group full">
-        <label>תיאור הפריט</label>
-        <textarea id="user-pdf-desc" style="min-height: 100px;"></textarea>
-      </div>
-      <div class="form-group full">
-        <label>תמונות להמחשה (עד 4 תמונות)</label>
-        <div id="user-pdf-image-preview" style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; min-height: 80px; align-items: flex-start;">
-          <!-- Previews will appear here -->
-        </div>
-        <input type="file" id="user-pdf-files" multiple accept="image/*" onchange="handleUserPdfFileSelection(event)" style="display: none;">
-        <button class="btn-secondary" onclick="document.getElementById('user-pdf-files').click()" style="width: 100%; border-style: dashed; padding: 18px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;">📸 בחר תמונות מהגלריה (עד 4)</button>
+    <div class="form-grid" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+      <div class="form-group" style="text-align: right;">
+        <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 8px;">שם נושא</label>
+        <input type="text" id="user-pdf-title" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 1rem; background: #fbfbfd;">
       </div>
       
-      <div class="form-group full" style="margin-top: 24px;">
-        <button class="btn-primary full-width" style="height: 56px; font-size: 1.1rem; font-weight: 800; border-radius: 16px;" onclick="submitUserPdfItem()">🚀 שלח ופרסם בחנות עכשיו</button>
+      <div class="form-group" style="text-align: right;">
+        <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 8px;">מייל / שם טלגרם</label>
+        <input type="text" id="user-pdf-contact" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 1rem; background: #fbfbfd;">
+      </div>
+
+      <div class="form-group" style="text-align: right;">
+        <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 8px;">תיאור</label>
+        <textarea id="user-pdf-desc" style="width: 100%; min-height: 120px; padding: 14px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 1rem; background: #fbfbfd; resize: vertical;"></textarea>
+      </div>
+
+      <!-- Expansion Trigger -->
+      <div style="text-align: right;">
+        <button id="pdf-extension-btn" onclick="togglePdfExtension()" style="background: #fff; border: 1px solid #d2d2d7; border-radius: 18px; padding: 14px 28px; color: #0071e3; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-right: 0; margin-left: auto; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.2s;">
+          <span>הרחבה (לא חובה)</span>
+          <span id="pdf-extension-arrow" style="font-size: 0.9rem;">◀</span>
+        </button>
+      </div>
+
+      <!-- Collapsible Section -->
+      <div id="pdf-extension-section" style="display: none; flex-direction: column; gap: 20px; padding: 20px; background: #fbfbfd; border-radius: 16px; border: 1px solid #eee; animation: fadeIn 0.3s ease;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group" style="text-align: right;">
+            <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 8px;">גיל</label>
+            <input type="number" id="user-pdf-age" placeholder="למשל: 25" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 1rem; background: #fff;">
+          </div>
+          <div class="form-group" style="text-align: right;">
+            <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 8px;">מיקום</label>
+            <input type="text" id="user-pdf-location" placeholder="למשל: תל אביב" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 1rem; background: #fff;">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="text-align: right;">
+        <label style="display: block; font-weight: 700; color: #86868b; margin-bottom: 12px;">תמונות להמחשה (עד 4 תמונות)</label>
+        <div id="user-pdf-image-preview" style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-start;">
+        </div>
+        <input type="file" id="user-pdf-files" multiple accept="image/*" onchange="handleUserPdfFileSelection(event)" style="display: none;">
+        <button class="btn-secondary" onclick="document.getElementById('user-pdf-files').click()" style="width: 100%; border-style: dashed; padding: 18px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; border: 1px dashed #0071e3; color: #0071e3; background: #fff;">📸 בחר תמונות (עד 4)</button>
+      </div>
+      
+      <div class="form-group" style="margin-top: 12px;">
+        <button class="btn-primary" style="width: 100%; height: 56px; font-size: 1.15rem; font-weight: 800; border-radius: 16px; background: #0071e3;" onclick="submitUserPdfItem()">שלח</button>
       </div>
     </div>
   </div>
@@ -178,35 +143,6 @@
 
 
 <!-- STORE PAGE -->
-<div id="page-store" class="page" style="max-width: 1000px; padding-top: 40px;">
-  <div class="store-hero" style="text-align: center; margin-bottom: 60px;">
-    <h2 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em;">פרויקט 11</h2>
-    <p style="color: #86868b; font-size: 1.1rem; margin-top: 10px;">כאן תוכל להוריד את התוכנה החדשה והמתקדמת שלנו.</p>
-  </div>
-  
-  <div style="display: flex; flex-wrap: wrap; gap: 40px; background: #ffffff; border-radius: 24px; padding: 40px; border: 1px solid var(--border-subtle); box-shadow: 0 10px 40px rgba(0,0,0,0.05); align-items: center;">
-    <div id="store-render-image-container" style="flex: 1; min-width: 250px; background: #fbfbfd; border-radius: 20px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 7rem; overflow: hidden;">
-      <div id="store-render-emoji" style="display: none;">🖥️</div>
-      <img id="store-render-image" src="https://pub-572449ca23df42e8b074673b3720fb60.r2.dev/image.png" style="display: block; width: 100%; height: 100%; object-fit: cover;" />
-    </div>
-    <div style="flex: 2; min-width: 300px;">
-      <div id="store-render-version" style="font-size: 0.85rem; color: #0071e3; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 8px; background: rgba(0, 113, 227, 0.1); display: inline-block; padding: 4px 12px; border-radius: 980px;">גרסה 1.0</div>
-      <h3 id="store-render-title" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 16px; color: #1d1d1f; letter-spacing: -0.02em;">התוכנה המקצועית שלי</h3>
-      <p id="store-render-desc" style="font-size: 1.1rem; color: #86868b; line-height: 1.6; margin-bottom: 32px; white-space: pre-wrap;">קבל גישה לכלים המתקדמים ביותר עם התוכנה שלנו. כלי חובה לכל מקצוען שמחפש לייעל עבודה ולחסוך זמן.</p>
-      
-      <div class="btn-platform-container">
-        <button class="btn-download-mac" onclick="downloadStorePlatform('Mac')">
-          <span class="platform-icon"></span>
-          להורדה ל-Mac
-        </button>
-        <button class="btn-download-android" onclick="downloadStorePlatform('Android')">
-          <span class="platform-icon">🤖</span>
-          להורדה ל-Android
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- ARTICLE PAGE -->
@@ -305,7 +241,7 @@
         <div class="tier-price">₪10<span>/חודש</span></div>
       </div>
       <ul class="pricing-features">
-        <li><i class="fa-solid fa-check"></i> גישה מלאה לכל הכתבות</li>
+        <li><i class="fa-solid fa-check"></i> גישה מלאה לכל הסיפורים</li>
         <li><i class="fa-solid fa-check"></i> גלישה ללא פרסומות</li>
         <li><i class="fa-solid fa-check"></i> עדכונים שבועיים למייל</li>
       </ul>
@@ -409,7 +345,7 @@
           </div>
           <div style="flex:1; min-width:180px; background:#f5f5f7; border-radius:16px; padding:24px; text-align:center;">
             <div style="font-size:2.5rem; font-weight:800;" id="stat-articles">0</div>
-            <div style="color:#86868b; font-size:0.9rem; margin-top:4px;">כתבות פעילות</div>
+            <div style="color:#86868b; font-size:0.9rem; margin-top:4px;">סיפורים פעילים</div>
           </div>
           <div style="flex:1; min-width:180px; background:#f5f5f7; border-radius:16px; padding:24px; text-align:center;">
             <div style="font-size:2.5rem; font-weight:800; color: #0071e3;" id="stat-messages">0</div>
@@ -441,8 +377,8 @@
       <!-- ARTICLES TAB -->
       <div id="admin-section-articles" class="admin-section" style="display: none;">
         <div class="admin-header">
-          <h2>ניהול כתבות</h2>
-          <button class="btn-primary" onclick="openArticleEditor()">+ כתבה חדשה</button>
+          <h2>ניהול סיפורים</h2>
+          <button class="btn-primary" onclick="openArticleEditor()">+ סיפור חדש</button>
         </div>
         <table class="admin-table">
           <thead>
@@ -488,40 +424,11 @@
       </div>
       
       <!-- STORE ADMIN TAB -->
-      <div id="admin-section-store" class="admin-section" style="display: none;">
-        <div class="admin-header">
-          <h2>ניהול פרויקט 11</h2>
-        </div>
-        <div style="background: #ffffff; border-radius: 16px; padding: 24px; border: 1px solid var(--border-subtle); display:flex; flex-direction:column; gap:16px;">
-          <input type="text" id="store-edit-title" placeholder="שם התוכנה" class="admin-input">
-          <input type="text" id="store-edit-version" placeholder="גרסה (למשל: גרסה 1.0)" class="admin-input">
-          <textarea id="store-edit-desc" placeholder="תיאור קצר של התוכנה" rows="4" class="admin-input"></textarea>
-          
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label style="font-size: 0.85rem; font-weight: 600; color: #1d1d1f;">תמונה (קובץ תמונה למוצר):</label>
-            <div style="display:flex; gap:8px;">
-              <input type="text" id="store-edit-image" placeholder="URL תמונה או קוד..." class="admin-input" style="flex:1;">
-              <button type="button" class="btn-secondary" style="padding: 0 16px; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer; white-space: nowrap;" onclick="document.getElementById('store-image-upload').click()">העלה תמונה מהמכשיר</button>
-              <input type="file" id="store-image-upload" accept="image/*" style="display:none;" onchange="handleStoreImageUpload(event)">
-            </div>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label style="font-size: 0.85rem; font-weight: 600; color: #1d1d1f;">קישור להורדה או מסמך למכירה:</label>
-            <div style="display:flex; gap:8px;">
-              <input type="text" id="store-edit-download" placeholder="הכנס קישור להורדת הקובץ (Google Drive וכו')" class="admin-input" style="flex:1;">
-            </div>
-            <p style="font-size: 0.8rem; color: #86868b; margin-top: 4px;">הלקוחות יקבלו את הקישור הזה כשילחצו על כפתור ההורדה.</p>
-          </div>
-          
-          <button class="btn-primary" onclick="saveStoreConfig()" style="width: 200px; margin-top: 8px;">שמור שינויים בחנות</button>
-        </div>
-      </div>
 
       <!-- PDF STORE ADMIN TAB -->
       <div id="admin-section-pdfstore" class="admin-section" style="display: none;">
         <div class="admin-header">
-          <h2>ניהול חנות PDF</h2>
+          <h2>ניהול תמונות גולשים</h2>
           <button class="btn-primary" onclick="openPdfItemEditor()">הוסף פריט</button>
         </div>
         <div id="pdf-admin-list" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px;">
@@ -600,10 +507,8 @@
       <h3 style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 800;">תפריט מנהלי</h3>
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <button class="admin-nav-btn active" onclick="switchAdminTab('dashboard', this)">ראשי (סטטיסטיקות)</button>
-        <button class="admin-nav-btn" onclick="switchAdminTab('calendar', this)">יומן תורים</button>
-        <button class="admin-nav-btn" onclick="switchAdminTab('store', this)">ניהול פרויקט 11</button>
-        <button class="admin-nav-btn" onclick="switchAdminTab('pdfstore', this)">ניהול חנות PDF</button>
-        <button class="admin-nav-btn" onclick="switchAdminTab('articles', this)">ניהול כתבות</button>
+        <button class="admin-nav-btn" onclick="switchAdminTab('pdfstore', this)">ניהול תמונות גולשים</button>
+        <button class="admin-nav-btn" onclick="switchAdminTab('articles', this)">ניהול סיפורים</button>
 
         <button class="admin-nav-btn" onclick="switchAdminTab('messages', this)" style="display: flex; justify-content: space-between; align-items: center;">
           תיבת הודעות
@@ -615,15 +520,6 @@
 
 
 
-      <div id="admin-section-calendar" class="admin-section" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-          <h2>📅 יומן תורים</h2>
-          <button class="btn-secondary" onclick="clearAppointments()" style="color:#ef4444; border-color:#ef4444; font-size:0.85rem;">מחק את כל התורים</button>
-        </div>
-        <div id="admin-calendar-list" style="display: grid; gap: 16px; margin-top: 20px;">
-          <!-- Appointments listed here -->
-        </div>
-      </div>
 
       <!-- SOCIAL LINKS ADMIN TAB -->
       <div id="admin-section-social" class="admin-section" style="display: none;">
@@ -880,12 +776,12 @@
         <span>₪5 / חודש</span>
       </div>
       
-      <p style="font-size: 0.85rem; color: #86868b; margin-top: 8px;">גישה מלאה לכל התוכן המורחב, כולל הורדות PDF ללא הגבלה.</p>
+      <p style="font-size: 0.85rem; color: #86868b; margin-top: 8px;">גישה מלאה לכל התוכן המורחב, כולל הורדת תמונות וקבצים ללא הגבלה.</p>
       
       <ul class="feature-list">
         <li>גלישה ללא פרסומות כלל</li>
-        <li>גישה בלעדית לכתבות עומק</li>
-        <li>הורדת קבצי PDF ללא הגבלה</li>
+        <li>גישה בלעדית לסיפורי עומק</li>
+        <li>הורדת תמונות וקבצים ללא הגבלה</li>
         <li>תמיכה טכנית מועדפת (24/7)</li>
         <li>עדכונים לפני כולם</li>
       </ul>

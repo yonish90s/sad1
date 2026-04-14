@@ -103,10 +103,8 @@ function showPage(page) {
   if (targetPage) targetPage.classList.add('active');
 
   if (page === 'home') renderNewsLayout();
-  if (page === 'store') renderStoreLayout();
   if (page === 'pdf-store') renderPdfStoreGrid();
   if (page === 'subscription') window.scrollTo({ top: 0, behavior: 'smooth' });
-  if (page === 'appointments') initBookingWidget();
   if (page === 'join') {
     if (currentUser) {
       document.getElementById('join-name').value = currentUser.name;
@@ -129,61 +127,6 @@ function showPage(page) {
 
 
 
-// ========== BOOKING LOGIC ==========
-// ========== BOOKING LOGIC ==========
-function initBookingWidget() {
-  const grid = document.getElementById('book-time-grid');
-  if (!grid) return;
-  const day = document.getElementById('book-day').value;
-  const appts = JSON.parse(localStorage.getItem('appointments') || '[]');
-  
-  let html = '';
-  selectedTime = ''; // Reset selection on day change
-  
-  for (let h = 7; h <= 18; h++) {
-    const time = `${h.toString().padStart(2, '0')}:00`;
-    // Check if this slot is already booked for this specific day
-    const isBooked = appts.some(a => a.day === day && a.time === time);
-    
-    if (isBooked) {
-      html += `<div class="time-slot booked" style="padding:10px; border:1px solid #eee; border-radius:10px; text-align:center; font-size:0.9rem; font-weight:600; background:#f5f5f7; color:#d2d2d7; cursor:not-allowed; text-decoration:line-through;">${time}</div>`;
-    } else {
-      html += `<div class="time-slot" onclick="selectTime(this)" style="padding:10px; border:1px solid #d2d2d7; border-radius:10px; text-align:center; cursor:pointer; font-size:0.9rem; font-weight:600; transition:0.2s; background:#fff; color:#1d1d1f;">${time}</div>`;
-    }
-  }
-  grid.innerHTML = html;
-}
-
-let selectedTime = '';
-function selectTime(el) {
-  if (el.classList.contains('booked')) return;
-  document.querySelectorAll('.time-slot').forEach(s => {
-    if (!s.classList.contains('booked')) {
-      s.style.borderColor = '#d2d2d7';
-      s.style.backgroundColor = '#fff';
-      s.style.color = '#1d1d1f';
-    }
-  });
-  el.style.borderColor = '#0071e3';
-  el.style.backgroundColor = 'rgba(0, 113, 227, 0.05)';
-  el.style.color = '#0071e3';
-  selectedTime = el.textContent;
-}
-
-function openBookingModal() {
-  const day = document.getElementById('book-day').value;
-  if (!selectedTime) {
-    showToast('❌ נא לבחור שעה פנויה');
-    return;
-  }
-  
-  document.getElementById('booking-selected-info').textContent = `יום ${day} בשעה ${selectedTime}`;
-  document.getElementById('booking-modal').classList.add('active');
-}
-
-function closeBookingModal() {
-  document.getElementById('booking-modal').classList.remove('active');
-}
 
 function openCheckoutModal() {
   console.log('Opening checkout modal...');
@@ -200,130 +143,10 @@ function closeCheckoutModal() {
   document.getElementById('checkout-modal').classList.remove('active');
 }
 
-function submitBookingDirect() {
-  const name = document.getElementById('book-name-direct').value;
-  const phone = document.getElementById('book-phone-direct').value;
-  const request = document.getElementById('book-request-direct').value;
-  const day = document.getElementById('book-day').value;
-  
-  if (!selectedTime) {
-    showToast('❌ נא לבחור שעה פנויה');
-    return;
-  }
-  if (!name || !phone) {
-    showToast('❌ נא למלא שם וטלפון');
-    return;
-  }
 
-  const appt = {
-    id: Date.now(),
-    name,
-    phone,
-    request,
-    day,
-    time: selectedTime,
-    created: new Date().toLocaleString('he-IL')
-  };
-  
-  const appts = JSON.parse(localStorage.getItem('appointments') || '[]');
-  appts.push(appt);
-  localStorage.setItem('appointments', JSON.stringify(appts));
-  
-  showToast('✅ התור נקבע בהצלחה!');
-  
-  // Transition to Success View
-  document.getElementById('booking-form-view').style.display = 'none';
-  document.getElementById('booking-success-view').style.display = 'block';
 
-  // Clear direct inputs
-  document.getElementById('book-name-direct').value = '';
-  document.getElementById('book-phone-direct').value = '';
-  document.getElementById('book-request-direct').value = '';
-  
-  initBookingWidget(); // Refresh grid to remove booked slot
-}
-
-function resetBookingView() {
-  document.getElementById('booking-form-view').style.display = 'block';
-  document.getElementById('booking-success-view').style.display = 'none';
-  selectedTime = ''; // Reset selection
-  initBookingWidget();
-}
-
-function submitBooking(e) {
-  e.preventDefault();
-  const name = document.getElementById('book-name').value;
-  const phone = document.getElementById('book-phone').value;
-  const request = document.getElementById('book-request').value;
-  const day = document.getElementById('book-day').value;
-  
-  const appt = {
-    id: Date.now(),
-    name,
-    phone,
-    request,
-    day,
-    time: selectedTime,
-    created: new Date().toLocaleString('he-IL')
-  };
-  
-  const appts = JSON.parse(localStorage.getItem('appointments') || '[]');
-  appts.push(appt);
-  localStorage.setItem('appointments', JSON.stringify(appts));
-  
-  showToast('✅ התור נקבע בהצלחה!');
-  
-  // If on appointments page, show success view
-  const formView = document.getElementById('booking-form-view');
-  if (formView && document.getElementById('page-appointments').classList.contains('active')) {
-    formView.style.display = 'none';
-    document.getElementById('booking-success-view').style.display = 'block';
-  }
-
-  closeBookingModal();
-  e.target.reset();
-  initBookingWidget(); // Refresh grid to remove booked slot
-}
 
 // ========== ADMIN CALENDAR ==========
-function renderAdminCalendar() {
-  const list = document.getElementById('admin-calendar-list');
-  if (!list) return;
-  const appts = JSON.parse(localStorage.getItem('appointments') || '[]');
-  
-  if (appts.length === 0) {
-    list.innerHTML = '<div style="text-align:center; padding:40px; color:#86868b;">אין תורים קבועים ביומן.</div>';
-    return;
-  }
-  
-  list.innerHTML = appts.reverse().map(a => `
-    <div style="background:#f5f5f7; border-radius:12px; padding:24px; border:1px solid var(--border-subtle); text-align:right;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
-        <div>
-          <div style="font-weight:800; font-size:1.2rem; color:#1d1d1f; margin-bottom:4px;">${escHtml(a.name)}</div>
-          <div style="font-size:0.95rem; color:#86868b;">📞 ${escHtml(a.phone)}</div>
-        </div>
-        <div style="text-align:left;">
-          <div style="font-weight:800; color:#0071e3; font-size:1.1rem;">יום ${escHtml(a.day)} | ${escHtml(a.time)}</div>
-          <div style="font-size:0.75rem; color:#86868b; margin-top:6px;">נקבע ב: ${a.created}</div>
-        </div>
-      </div>
-      ${a.request ? `
-        <div style="background:#fff; border-radius:10px; padding:16px; border:1px solid #e1e1e6; font-size:1rem; color:#424245; line-height:1.5;">
-          <strong>בקשה:</strong> ${escHtml(a.request)}
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-}
-
-function clearAppointments() {
-  if (confirm('האם אתה בטוח שברצונך למחוק את כל התורים?')) {
-    localStorage.removeItem('appointments');
-    renderAdminCalendar();
-    showToast('🗑️ היומן נוקה');
-  }
-}
 
 
 function goBack() {
@@ -520,15 +343,6 @@ function initAdminDashboard() {
     </tr>
   `).join('');
 
-  const sc = JSON.parse(localStorage.getItem('storeConfig')) || { title: 'התוכנה המקצועית שלי', version: 'גרסה 1.0', desc: 'קבל גישה לכלים המתקדמים ביותר עם התוכנה שלנו. כלי חובה לכל מקצוען שמחפש לייעל עבודה ולחסוך זמן.', image: '', downloadLink: '' };
-  const storeTitleInput = document.getElementById('store-edit-title');
-  if(storeTitleInput) {
-    storeTitleInput.value = sc.title || '';
-    document.getElementById('store-edit-version').value = sc.version || '';
-    document.getElementById('store-edit-desc').value = sc.desc || '';
-    document.getElementById('store-edit-image').value = sc.image || '';
-    document.getElementById('store-edit-download').value = sc.downloadLink || '';
-  }
 
   // Populate Social Links inside Admin
   const sl = loadSocialLinks();
@@ -549,7 +363,6 @@ function switchAdminTab(tabId, btnEl) {
     document.querySelectorAll('.admin-nav-btn').forEach(btn => btn.classList.remove('active'));
     btnEl.classList.add('active');
   }
-  if (tabId === 'calendar') renderAdminCalendar();
   if (tabId === 'pdfstore') renderPdfAdminList();
 
 }
@@ -725,134 +538,11 @@ function handleImageUpload(event) {
 }
 
 // ========== STORE MANAGEMENT ==========
-function renderStoreLayout() {
-  const c = JSON.parse(localStorage.getItem('storeConfig')) || { title: 'התוכנה המקצועית שלי', version: 'גרסה 1.0', desc: 'קבל גישה לכלים המתקדמים ביותר עם התוכנה שלנו. כלי חובה לכל מקצוען שמחפש לייעל עבודה ולחסוך זמן.', image: '', downloadLink: '' };
-  const contentArea = document.getElementById('store-content-area');
-  
-  if (!contentArea) return;
-  
-  contentArea.innerHTML = `
-    <div class="store-hero">
-      <div class="store-visual" style="position: relative;">
-        ${c.image ? `<img src="${c.image}" id="store-render-image" class="store-main-image" style="display: block;">` : `<div id="store-render-emoji" class="store-emoji">🚀</div>`}
-        ${isAdmin ? `<button onclick="changeStoreImage()" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; padding: 6px 14px; border-radius: 980px; font-size: 0.8rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">📷 ערוך תמונה</button>` : ''}
-      </div>
-      <div class="store-details">
-        <div class="store-badge" id="store-render-version" ${isAdmin ? 'contenteditable="true" style="border-bottom: 1px dashed #0071e3;"' : ''}>${escHtml(c.version)}</div>
-        <h1 class="store-title" id="store-render-title" ${isAdmin ? 'contenteditable="true" style="border-bottom: 2px dashed #0071e3;"' : ''}>${escHtml(c.title)}</h1>
-        <p class="store-desc" id="store-render-desc" ${isAdmin ? 'contenteditable="true" style="border: 1px dashed #0071e3; padding: 10px; border-radius: 8px;"' : ''}>${escHtml(c.desc)}</p>
-        
-        <div class="btn-platform-container">
-          <button class="btn-download-mac" onclick="downloadStorePlatform('Mac')">
-            <span class="platform-icon"></span>
-            להורדה ל-Mac
-          </button>
-          <button class="btn-download-android" onclick="downloadStorePlatform('Android')">
-            <span class="platform-icon">🤖</span>
-            להורדה ל-Android
-          </button>
-        </div>
-        
-        ${isAdmin ? `
-          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
-            <button class="btn-primary" onclick="saveInlineStoreConfig()" style="background: #34c759; padding: 12px 24px; font-size: 0.95rem; border-radius: 980px;">💾 שמור שינויי חנות</button>
-          </div>
-        ` : ''}
-      </div>
-    </div>
-  `;
-}
 
-function saveInlineStoreConfig() {
-  const title = document.getElementById('store-render-title').innerText.trim();
-  const version = document.getElementById('store-render-version').innerText.trim();
-  const desc = document.getElementById('store-render-desc').innerText.trim();
-  const imgEl = document.getElementById('store-render-image');
-  const image = imgEl ? imgEl.src : '';
-  
-  const currentConfig = JSON.parse(localStorage.getItem('storeConfig')) || {};
-  const config = { ...currentConfig, title, version, desc, image };
-  
-  localStorage.setItem('storeConfig', JSON.stringify(config));
-  showToast('✅ הגדרות פרויקט 11 עודכנו בהצלחה!');
-}
 
-function changeStoreImage() {
-  const newUrl = prompt('הכנס כתובת URL לתמונת התוכנה:');
-  if (newUrl) {
-    const visual = document.querySelector('.store-visual');
-    visual.innerHTML = `<img src="${newUrl}" id="store-render-image" class="store-main-image" style="display: block;">
-                        <button onclick="changeStoreImage()" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; padding: 6px 14px; border-radius: 980px; font-size: 0.8rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">📷 ערוך תמונה</button>`;
-  }
-}
 
-function saveStoreConfig() {
-  const title = document.getElementById('store-edit-title').value;
-  const version = document.getElementById('store-edit-version').value;
-  const desc = document.getElementById('store-edit-desc').value;
-  const image = document.getElementById('store-edit-image').value;
-  const downloadLink = document.getElementById('store-edit-download').value;
-  
-  const config = { title, version, desc, image, downloadLink };
-  localStorage.setItem('storeConfig', JSON.stringify(config));
-  
-  renderStoreLayout();
-  showToast('הגדרות פרויקט 11 נשמרו בהצלחה!');
-}
 
-function handleStoreImageUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  showToast('מעבד תמונה...');
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 600;
-      let width = img.width;
-      let height = img.height;
 
-      if (width > MAX_WIDTH) {
-        height = Math.round(height * (MAX_WIDTH / width));
-        width = MAX_WIDTH;
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      document.getElementById('store-edit-image').value = compressedDataUrl;
-      showToast('התמונה מוכנה! ✅');
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function downloadStorePlatform(platform) {
-  showToast(`⚡ מכין הורדה עבור ${platform}...`);
-  
-  const link = document.createElement('a');
-  if (platform === 'Mac') {
-    link.href = 'https://pub-572449ca23df42e8b074673b3720fb60.r2.dev/app-mac.dmg';
-  } else {
-    link.href = 'https://pub-572449ca23df42e8b074673b3720fb60.r2.dev/image.png';
-  }
-  
-  link.download = platform === 'Mac' ? 'app-mac.dmg' : 'software-preview.png';
-  document.body.appendChild(link);
-  
-  setTimeout(() => {
-    link.click();
-    document.body.removeChild(link);
-    showToast('✅ ההורדה החלה!');
-  }, 1000);
-}
-
-function downloadStoreSoftware() {
-  downloadStorePlatform('Default');
-}
 
 // ========== PDF STORE ==========
 const typeEmoji = { 'PDF': '📄', 'תוכנה': '🖥️', 'סרטון': '📹', 'קובץ': '📁', 'מדריך': '📚' };
@@ -884,7 +574,15 @@ function renderPdfStoreGrid() {
         <div class="pdf-card-type">${escHtml(item.type)}</div>
         <div class="pdf-card-title">${escHtml(item.title)}</div>
         ${item.desc ? `<div class="pdf-card-desc">${escHtml(item.desc)}</div>` : ''}
-        <div class="pdf-card-price">${escHtml(item.price || 'חינם')}</div>
+        
+        <div class="pdf-card-price" style="font-size: 0.85rem; color: #86868b; text-align: center; width: 100%;">
+          ${item.type === 'תוכן גולשים' ? 
+            `<div style="display:flex; flex-direction:column; gap:4px;">
+               <span style="color:var(--primary); font-weight:700;">${escHtml(item.date)}</span>
+               <span style="font-size:0.8rem;">${escHtml(item.contact || '')}</span>
+             </div>` : 
+            escHtml(item.price || 'חינם')}
+        </div>
       </div>
     `;
   }).join('');
@@ -897,7 +595,13 @@ function showProductDetail(index) {
   if (!item) return;
   
   document.getElementById('pdp-title').textContent = item.title;
-  document.getElementById('pdp-desc').textContent = item.desc || '';
+  let metadataHtml = '';
+  if (item.age) metadataHtml += `<span style="background:#f5f5f7; padding:4px 12px; border-radius:980px; font-size:0.85rem;">גיל: ${escHtml(item.age)}</span>`;
+  if (item.location) metadataHtml += `<span style="background:#f5f5f7; padding:4px 12px; border-radius:980px; font-size:0.85rem;">מיקום: ${escHtml(item.location)}</span>`;
+  if (item.contact) metadataHtml += `<div style="margin-top:8px; color:var(--primary); font-weight:600;">איש קשר: ${escHtml(item.contact)}</div>`;
+  
+  const descEl = document.getElementById('pdp-desc');
+  descEl.innerHTML = metadataHtml + `<div style="margin-top:16px;">${escHtml(item.desc || '')}</div>`;
   
   // Gallery Logic
   const images = item.images || [];
@@ -1212,7 +916,7 @@ function toggleTheme() {
 
 // ========== INIT ==========
 initTheme();
-showPage('home');
+showPage('pdf-store');
 
 
 
@@ -1488,7 +1192,10 @@ function removeUserPdfImage(index) {
 
 async function submitUserPdfItem() {
   const title = document.getElementById('user-pdf-title').value.trim();
+  const contact = document.getElementById('user-pdf-contact').value.trim();
   const desc = document.getElementById('user-pdf-desc').value.trim();
+  const age = document.getElementById('user-pdf-age').value.trim();
+  const location = document.getElementById('user-pdf-location').value.trim();
   
   if (!title) {
     showToast('❌ נא להזין שם לפריט');
@@ -1512,7 +1219,10 @@ async function submitUserPdfItem() {
   setTimeout(() => {
     const newItem = {
       title: title,
+      contact: contact,
       desc: desc,
+      age: age,
+      location: location,
       type: 'תוכן גולשים',
       images: selectedUserPdfImages,
       link: '#',
@@ -1525,7 +1235,10 @@ async function submitUserPdfItem() {
     
     // Reset form
     document.getElementById('user-pdf-title').value = '';
+    document.getElementById('user-pdf-contact').value = '';
     document.getElementById('user-pdf-desc').value = '';
+    document.getElementById('user-pdf-age').value = '';
+    document.getElementById('user-pdf-location').value = '';
     selectedUserPdfImages = [];
     renderUserPdfPreviews();
     
@@ -1546,7 +1259,17 @@ async function submitUserPdfItem() {
   }, 400);
 }
 
-
+function togglePdfExtension() {
+  const section = document.getElementById('pdf-extension-section');
+  const arrow = document.getElementById('pdf-extension-arrow');
+  if (section.style.display === 'none') {
+    section.style.display = 'flex';
+    arrow.innerHTML = '▼';
+  } else {
+    section.style.display = 'none';
+    arrow.innerHTML = '◀';
+  }
+}
 function switchAuthTab(type) {
   const loginTab = document.getElementById('tab-login');
   const registerTab = document.getElementById('tab-register');

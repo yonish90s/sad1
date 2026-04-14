@@ -101,17 +101,6 @@ body.dark-theme #theme-toggle {
   background: rgba(255, 255, 255, 0.1);
 }
 
-body.dark-theme .time-slot:not(.booked) {
-  background: #2c2c2e !important;
-  color: #fff !important;
-  border-color: #3a3a3c !important;
-}
-
-body.dark-theme .time-slot.booked {
-  background: #1c1c1e !important;
-  color: #444 !important;
-  border-color: #222 !important;
-}
 
 body.dark-theme .chip {
   background: #2c2c2e;
@@ -1536,18 +1525,6 @@ body {
   }
 }
 
-.time-slot:hover {
-  border-color: #0071e3 !important;
-  background: rgba(0, 113, 227, 0.02) !important;
-}
-
-#book-time-grid::-webkit-scrollbar {
-  width: 6px;
-}
-#book-time-grid::-webkit-scrollbar-thumb {
-  background: #d2d2d7;
-  border-radius: 10px;
-}
 
 body.dark-theme .product-detail,
 body.dark-theme .product-pdp-container,
@@ -1736,20 +1713,6 @@ body.dark-theme .sidebar-card p {
     min-height: 320px;
   }
 
-  /* Appointments */
-  #page-appointments {
-    padding: 20px 12px;
-  }
-  
-  #page-appointments .sidebar-card {
-    padding: 24px;
-    border-radius: 24px;
-  }
-  
-  .booking-widget > div {
-    grid-template-columns: 1fr !important;
-    gap: 20px;
-  }
   
   /* Footer */
   .footer-columns {

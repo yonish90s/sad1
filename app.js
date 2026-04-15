@@ -37,7 +37,6 @@ let isAdmin = localStorage.getItem('isAdmin') === 'true';
 // Cleanup obsolete data
 if (localStorage.getItem('viewerPhotos')) localStorage.removeItem('viewerPhotos');
 if (localStorage.getItem('comicsStore')) localStorage.removeItem('comicsStore');
-if (localStorage.getItem('pdfStoreItems')) localStorage.removeItem('pdfStoreItems');
 
 let previousPage = 'home';
 

@@ -232,12 +232,25 @@ function showArticle(id) {
     </header>
     <div class="article-hero-img" id="inline-hero-img" style="background-image: url('${a.image}'); position: relative;">
     </div>
-    <div class="article-body">
-      <div id="inline-content">
-        ${a.content ? a.content : `
-        <p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה, אזור זה יישאב ממסד הנתונים ויכיל פסקאות, ציטוטים מורחבים, גלריות תמונות ואפשרויות לשיתוף ברשתות חברתיות.</p>
-        <p>חברת הטכנולוגיה המובילה חשפה לאחרונה את כל העדכונים של המערכת המיוחלת החדשה. באירוע שערכה, השתתפו אלפי עיתונאי טכנולוגיה מכל העולם, שזכו לראות את כלי התוכנה המתקדמים ואת החומרה.</p>
-        <p>בנוסף, הושם דגש מיוחד על יכולות בינה מלאכותית, פרטיות ואבטחת מידע, עם שיפורים שיהפכו כל פעולה ליעילה, נוחה ומאובטחת יותר מתמיד.</p>
+      <div class="article-body" style="position:relative;">
+        ${(a.isPremium && !isAdmin) ? `
+        <div id="inline-content" style="filter: blur(6px); user-select: none; pointer-events: none; opacity: 0.5;">
+          ${a.content ? a.content.substring(0, 300) + '... (המשך הכתבה חסומה)' : `<p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה...</p>`}
+        </div>
+        <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255,255,255,0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 85%; max-width: 400px; border: 1px solid var(--border-subtle); backdrop-filter: blur(10px);">
+          <div style="font-size: 3.5rem; margin-bottom: 16px;">💎</div>
+          <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: #1d1d1f;">תוכן פרימיום</h3>
+          <p style="color: #86868b; margin-bottom: 24px; font-size: 1.05rem;">סיפור זה זמין למנויים בלבד. הצטרף עכשיו כדי לקבל גישה מלאה לכל הכתבות שלנו.</p>
+          <button class="btn-primary" onclick="showPage('subscription')" style="width: 100%; font-size: 1.1rem; padding: 14px;">לרכישת מנוי שבועי/חודשי</button>
+        </div>
+        ` : `
+        <div id="inline-content">
+          ${a.content ? a.content : `
+          <p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה, אזור זה יישאב ממסד הנתונים ויכיל פסקאות, ציטוטים מורחבים, גלריות תמונות ואפשרויות לשיתוף ברשתות חברתיות.</p>
+          <p>חברת הטכנולוגיה המובילה חשפה לאחרונה את כל העדכונים של המערכת המיוחלת החדשה. באירוע שערכה, השתתפו אלפי עיתונאי טכנולוגיה מכל העולם, שזכו לראות את כלי התוכנה המתקדמים ואת החומרה.</p>
+          <p>בנוסף, הושם דגש מיוחד על יכולות בינה מלאכותית, פרטיות ואבטחת מידע, עם שיפורים שיהפכו כל פעולה ליעילה, נוחה ומאובטחת יותר מתמיד.</p>
+          `}
+        </div>
         `}
       </div>
       
@@ -333,10 +346,11 @@ function initAdminDashboard() {
   list.innerHTML = newsArticles.map(a => `
     <tr>
       <td>${a.id}</td>
-      <td><strong>${escHtml(a.title)}</strong> ${a.isTop ? '🌟' : ''}</td>
+      <td><strong>${escHtml(a.title)}</strong> ${a.isTop ? '🌟' : ''} ${a.isPremium ? '💎' : ''}</td>
       <td>${escHtml(a.category)}</td>
       <td>${escHtml(a.author)}</td>
       <td style="display:flex; gap:8px;">
+        <button class="remove-btn" style="padding: 4px 12px; font-size: 0.85rem; border: none; background: #0071e3; color: white; border-radius: 6px; cursor: pointer;" onclick="editArticle(${a.id})">ערוך</button>
         <button class="remove-btn" style="padding: 4px 12px; font-size: 0.85rem; border: none; background: transparent;" onclick="deleteArticle(${a.id})">מחק</button>
       </td>
     </tr>
@@ -420,6 +434,27 @@ function deleteArticle(id) {
   }
 }
 
+function editArticle(id) {
+  const article = newsArticles.find(a => a.id === id);
+  if (!article) return;
+  document.getElementById('admin-editor').classList.remove('hidden');
+  const editorTitle = document.getElementById('admin-editor').querySelector('h3');
+  
+  editorTitle.textContent = 'עריכת כתבה';
+  document.getElementById('edit-id').value = article.id;
+  document.getElementById('edit-title').value = article.title;
+  document.getElementById('edit-category').value = article.category;
+  document.getElementById('edit-author').value = article.author;
+  document.getElementById('edit-time').value = article.time;
+  document.getElementById('edit-image').value = article.image;
+  document.getElementById('edit-snippet').value = article.snippet;
+  document.getElementById('edit-content').value = article.content;
+  document.getElementById('edit-isTop').checked = !!article.isTop;
+  document.getElementById('edit-isPremium').checked = !!article.isPremium;
+  
+  document.getElementById('admin-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
 function openArticleEditor() {
   document.getElementById('admin-editor').classList.remove('hidden');
   const editorTitle = document.getElementById('admin-editor').querySelector('h3');
@@ -434,15 +469,15 @@ function openArticleEditor() {
   document.getElementById('edit-snippet').value = '';
   document.getElementById('edit-content').value = '';
   document.getElementById('edit-isTop').checked = false;
+  document.getElementById('edit-isPremium').checked = false;
   
   document.getElementById('admin-editor').scrollIntoView({ behavior: 'smooth' });
 }
 
-
-
 function saveAdminArticle() {
   const idValue = document.getElementById('edit-id').value;
   const isTop = document.getElementById('edit-isTop').checked;
+  const isPremium = document.getElementById('edit-isPremium').checked;
   
   const articleObj = {
     id: idValue ? Number(idValue) : nextId++,
@@ -453,7 +488,8 @@ function saveAdminArticle() {
     image: document.getElementById('edit-image').value,
     snippet: document.getElementById('edit-snippet').value,
     content: document.getElementById('edit-content').value,
-    isTop: isTop ? (newsArticles.filter(a => a.isTop).length + 1) : false
+    isTop: isTop ? (newsArticles.filter(a => a.isTop).length + 1) : false,
+    isPremium: isPremium
   };
 
   if(!articleObj.title) {
@@ -461,13 +497,20 @@ function saveAdminArticle() {
     return;
   }
 
-  newsArticles.unshift(articleObj);
-  showToast('נוצר בהצלחה');
+  if (idValue) {
+    const idx = newsArticles.findIndex(a => a.id == idValue);
+    if (idx !== -1) newsArticles[idx] = articleObj;
+    else newsArticles.unshift(articleObj);
+    showToast('עודכן בהצלחה');
+  } else {
+    newsArticles.unshift(articleObj);
+    showToast('נוצר בהצלחה');
+  }
 
   if (isTop) {
      const topArts = newsArticles.filter(a => a.isTop).sort((a,b) => a.isTop - b.isTop);
      if(topArts.length > 3) {
-        topArts[topArts.length-1].isTop = false; // Limit to 3 top items max implicitly
+        topArts[topArts.length-1].isTop = false; 
      }
   }
 
@@ -597,7 +640,10 @@ function showProductDetail(index) {
   let metadataHtml = '';
   if (item.age) metadataHtml += `<span style="background:#f5f5f7; padding:4px 12px; border-radius:980px; font-size:0.85rem;">גיל: ${escHtml(item.age)}</span>`;
   if (item.location) metadataHtml += `<span style="background:#f5f5f7; padding:4px 12px; border-radius:980px; font-size:0.85rem;">מיקום: ${escHtml(item.location)}</span>`;
-  if (item.contact) metadataHtml += `<div style="margin-top:8px; color:var(--primary); font-weight:600;">איש קשר: ${escHtml(item.contact)}</div>`;
+  if (item.contact) {
+    metadataHtml += `<div style="margin-top:8px; color:var(--primary); font-weight:600; cursor:pointer;" onclick="showUserProfile('${escHtml(item.contact)}')">איש קשר: <span style="text-decoration:underline;">${escHtml(item.contact)}</span></div>`;
+    metadataHtml += `<div style="margin-top:8px;"><button onclick="openChatWith('${escHtml(item.contact)}')" style="background:none; border:1px solid var(--primary); color:var(--primary); border-radius:980px; padding:4px 12px; cursor:pointer; font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px;"><i class="fa-regular fa-comment"></i> שלח הודעה לאיש קשר</button></div>`;
+  }
   
   const descEl = document.getElementById('pdp-desc');
   descEl.innerHTML = metadataHtml + `<div style="margin-top:16px;">${escHtml(item.desc || '')}</div>`;
@@ -1042,6 +1088,7 @@ function updateUserUI() {
   const btnJoin = document.getElementById('btn-join');
   const profileBadge = document.getElementById('user-profile-badge');
   const btnLogoutNav = document.getElementById('btn-logout-nav');
+  const btnInboxNav = document.getElementById('btn-inbox-nav');
   
   if (!btnJoin || !profileBadge || !btnLogoutNav) return;
 
@@ -1052,6 +1099,7 @@ function updateUserUI() {
     btnJoin.style.display = 'none';
     profileBadge.style.display = 'flex';
     btnLogoutNav.style.display = 'block';
+    if(btnInboxNav && isUserLoggedIn) btnInboxNav.style.display = 'flex';
 
     if (isAdminLoggedIn && !isUserLoggedIn) {
       document.getElementById('user-badge-avatar').style.display = 'none';
@@ -1077,6 +1125,7 @@ function updateUserUI() {
     btnJoin.style.display = 'block';
     profileBadge.style.display = 'none';
     btnLogoutNav.style.display = 'none';
+    if(btnInboxNav) btnInboxNav.style.display = 'none';
     
     document.querySelectorAll('[id$="-comment-input-area"]').forEach(el => el.style.display = 'none');
     document.querySelectorAll('[id$="-comment-join-prompt"]').forEach(el => el.style.display = 'block');
@@ -1132,9 +1181,14 @@ function renderComments(type, targetId) {
         <img src="${c.userAvatar || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&q=80&w=200&h=200'}" alt="${escHtml(c.userName)}">
       </div>
       <div class="comment-body">
-        <div class="comment-header">
-          <span class="comment-author">${escHtml(c.userName)}</span>
-          <span class="comment-date">${c.date}</span>
+        <div class="comment-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div>
+            <span class="comment-author" style="margin-left: 8px;">${escHtml(c.userName)}</span>
+            <span class="comment-date">${c.date}</span>
+          </div>
+          ${currentUser && currentUser.name !== c.userName ? 
+            `<button onclick="openChatWith('${escHtml(c.userName)}')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:0.9rem; font-weight:600;"><i class="fa-regular fa-comment"></i> שלח הודעה</button>` 
+            : ''}
         </div>
         <div class="comment-text">${escHtml(c.text)}</div>
       </div>
@@ -1189,7 +1243,30 @@ function removeUserPdfImage(index) {
   renderUserPdfPreviews();
 }
 
-async function submitUserPdfItem() {
+function toggleScheduleSection() {
+  const section = document.getElementById('schedule-section');
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    
+    const now = new Date();
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 1);
+    
+    const toLocalISO = (d) => {
+      const tzOffset = d.getTimezoneOffset() * 60000; 
+      return (new Date(d - tzOffset)).toISOString().slice(0, 16);
+    };
+
+    const scheduleInput = document.getElementById('user-pdf-schedule');
+    scheduleInput.min = toLocalISO(now);
+    scheduleInput.max = toLocalISO(maxDate);
+    scheduleInput.value = toLocalISO(now);
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+async function submitUserPdfItem(isScheduled = false) {
   const title = document.getElementById('user-pdf-title').value.trim();
   const contact = document.getElementById('user-pdf-contact').value.trim();
   const desc = document.getElementById('user-pdf-desc').value.trim();
@@ -1204,6 +1281,34 @@ async function submitUserPdfItem() {
   if (selectedUserPdfImages.length === 0) {
     showToast('❌ נא לבחור לפחות תמונה אחת להמחשה');
     return;
+  }
+
+  let scheduledDateStr = '';
+  if (isScheduled) {
+    const scheduledVal = document.getElementById('user-pdf-schedule')?.value;
+    if (!scheduledVal) {
+      showToast('❌ נא לבחור תאריך ושעה לתזמון');
+      return;
+    }
+    const scheduleDateObj = new Date(scheduledVal);
+    const now = new Date();
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 1);
+    
+    if (scheduleDateObj < now) {
+      showToast('❌ לא ניתן לתזמן לעבר');
+      return;
+    }
+    if (scheduleDateObj > maxDate) {
+      showToast('❌ ניתן לתזמן עד חודש קדימה בלבד');
+      return;
+    }
+    try {
+      const dtFormatter = new Intl.DateTimeFormat('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      scheduledDateStr = dtFormatter.format(scheduleDateObj);
+    } catch(e) {
+      scheduledDateStr = scheduleDateObj.toLocaleString('he-IL');
+    }
   }
   
   // Show loading overlay
@@ -1225,7 +1330,8 @@ async function submitUserPdfItem() {
       type: 'תוכן גולשים',
       images: selectedUserPdfImages,
       link: '#',
-      date: new Date().toLocaleDateString('he-IL')
+      date: isScheduled ? `מתוזמן ל: ${scheduledDateStr}` : new Date().toLocaleDateString('he-IL'),
+      author: currentUser ? currentUser.name : null
     };
     
     const items = getPdfItems();
@@ -1268,6 +1374,88 @@ function togglePdfExtension() {
     section.style.display = 'none';
     arrow.innerHTML = '◀';
   }
+}
+
+// ========== USER PROFILE ==========
+function handleProfileBadgeClick() {
+  if (currentUser) {
+    showUserProfile(currentUser.name);
+  } else {
+    showPage('join');
+  }
+}
+
+function showUserProfile(targetUserName) {
+  const userName = targetUserName || (currentUser ? currentUser.name : null);
+  if (!userName) return;
+  
+  const isMe = currentUser && userName === currentUser.name;
+  
+  let userAvatar = 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&q=80&w=200&h=200';
+  
+  if (isMe) {
+    userAvatar = currentUser.avatar || userAvatar;
+  } else {
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+    if (registeredUsers[userName] && registeredUsers[userName].avatar) {
+      userAvatar = registeredUsers[userName].avatar;
+    }
+  }
+
+  document.getElementById('profile-page-name').textContent = isMe ? 'הפרופיל שלי' : `הפרופיל של ${escHtml(userName)}`;
+  document.getElementById('profile-page-subtitle').textContent = isMe ? 'היסטוריית התמונות שהעליתי לאתר' : `היסטוריית ההעלאות של ${escHtml(userName)}`;
+  document.getElementById('profile-page-avatar').src = userAvatar;
+  
+  const actionsContainer = document.getElementById('profile-page-actions');
+  if (actionsContainer) {
+    if (!isMe && currentUser) {
+      actionsContainer.innerHTML = `<button class="btn-primary" onclick="openChatWith('${escHtml(userName)}')"><i class="fa-regular fa-comment"></i> שלח הודעה ל-${escHtml(userName)}</button>`;
+    } else {
+      actionsContainer.innerHTML = '';
+    }
+  }
+  
+  renderUserProfileGrid(userName);
+  showPage('profile');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderUserProfileGrid(userName) {
+  const grid = document.getElementById('profile-history-grid');
+  if (!grid) return;
+  
+  const allItems = getPdfItems();
+  const userItems = allItems.map((item, index) => ({ item, index }))
+                            .filter(obj => obj.item.author === userName || obj.item.contact === userName);
+                            
+  if (userItems.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:80px; color:#86868b; font-size:1.1rem;">עדיין אין למשתמש העלאות זמינות באתר.</div>';
+    return;
+  }
+  
+  grid.innerHTML = userItems.map(obj => {
+    const item = obj.item;
+    const i = obj.index;
+    const icon = typeEmoji[item.type] || '📄';
+    const mainImg = (item.images && item.images.length > 0) ? item.images[0] : '';
+    
+    return `
+      <div class="pdf-card" onclick="showProductDetail(${i})">
+        ${mainImg ? `<img src="${mainImg}" style="width:100%; height:160px; object-fit:cover; border-radius:12px; margin-bottom:12px;" />` : 
+                    `<div class="pdf-card-icon">${icon}</div>`}
+        <div class="pdf-card-type">${escHtml(item.type)}</div>
+        <div class="pdf-card-title">${escHtml(item.title)}</div>
+        ${item.desc ? `<div class="pdf-card-desc">${escHtml(item.desc)}</div>` : ''}
+        
+        <div class="pdf-card-price" style="font-size: 0.85rem; color: #86868b; text-align: center; width: 100%;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+             <span style="color:var(--primary); font-weight:700;">${escHtml(item.date)}</span>
+             <span style="font-size:0.8rem;">${escHtml(item.contact || '')}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 function switchAuthTab(type) {
   const loginTab = document.getElementById('tab-login');
@@ -1315,6 +1503,158 @@ function handleAuthSubmit(type) {
   } else {
     saveUserProfile();
   }
+}
+
+// ========== PRIVATE MESSAGING ==========
+function getPrivateChats() {
+  return JSON.parse(localStorage.getItem('privateChats') || '{}');
+}
+
+function savePrivateChats(chatsObj) {
+  localStorage.setItem('privateChats', JSON.stringify(chatsObj));
+}
+
+let activeChatUser = null;
+
+function showInboxPage() {
+  if (!currentUser) return;
+  activeChatUser = null;
+  document.getElementById('chat-header').style.visibility = 'hidden';
+  document.getElementById('chat-input-area').style.visibility = 'hidden';
+  document.getElementById('chat-messages-area').innerHTML = '<div style="margin: auto; color: #86868b; text-align: center;">בחר שיחה כדי להתחיל או שלח הודעה למשתמשים במערכת.</div>';
+  renderInboxList();
+  showPage('inbox');
+}
+
+function openChatWith(userName) {
+  if (!currentUser) {
+    showToast('עליך להתחבר כדי לשלוח הודעות');
+    return;
+  }
+  if (userName === currentUser.name) {
+    showToast('אינך יכול לשלוח הודעה לעצמך');
+    return;
+  }
+  activeChatUser = userName;
+  renderInboxList();
+  
+  const header = document.getElementById('chat-header');
+  const headerName = document.getElementById('chat-header-name');
+  const inputArea = document.getElementById('chat-input-area');
+  
+  header.style.visibility = 'visible';
+  headerName.textContent = userName;
+  inputArea.style.visibility = 'visible';
+  
+  renderChatMessages();
+  showPage('inbox');
+}
+
+function renderInboxList() {
+  const chatListEl = document.getElementById('inbox-chat-list');
+  if (!chatListEl) return;
+  
+  if (!currentUser) return; // Prevent errors if logged out
+  
+  const chats = getPrivateChats();
+  const myChats = [];
+  
+  Object.keys(chats).forEach(key => {
+    if (key.includes(currentUser.name)) {
+      const names = key.split('_');
+      // If a username contains an underscore, this split logic could break, but assuming names don't
+      const otherUser = names[0] === currentUser.name ? names[1] : names[0];
+      const msgs = chats[key];
+      const lastMsg = msgs[msgs.length - 1];
+      if (lastMsg) {
+         myChats.push({ otherUser, lastMsg });
+      }
+    }
+  });
+
+  myChats.sort((a, b) => new Date(b.lastMsg.rawDate) - new Date(a.lastMsg.rawDate));
+
+  if (myChats.length === 0) {
+    chatListEl.innerHTML = '<div style="padding: 20px; color: #86868b; font-size: 0.9rem; text-align:center;">אין לך עדיין שיחות. שלח הודעה למישהו על ידי לחיצה על שמם בתגובות למטה!</div>';
+    return;
+  }
+  
+  chatListEl.innerHTML = myChats.map(c => `
+    <div class="inbox-chat-item ${activeChatUser === c.otherUser ? 'active' : ''}" onclick="openChatWith('${escHtml(c.otherUser)}')">
+      <div class="inbox-chat-avatar" style="background:#0071e3; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.5rem;">
+        ${c.otherUser.charAt(0)}
+      </div>
+      <div class="inbox-chat-info">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="inbox-chat-name">${escHtml(c.otherUser)}</div>
+          <div style="font-size:0.7rem; color:#a1a1a6;">${c.lastMsg.date}</div>
+        </div>
+        <div class="inbox-chat-preview">${c.lastMsg.sender === currentUser.name ? 'אתה: ' : ''}${escHtml(c.lastMsg.text)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderChatMessages() {
+  if (!activeChatUser) return;
+  const msgsArea = document.getElementById('chat-messages-area');
+  
+  const chats = getPrivateChats();
+  const key = [currentUser.name, activeChatUser].sort().join('_');
+  const msgs = chats[key] || [];
+  
+  if (msgs.length === 0) {
+    msgsArea.innerHTML = '<div style="margin: auto; color: #86868b; text-align: center;">התחל את השיחה עכשיו, שלח הודעה! 👋</div>';
+    return;
+  }
+  
+  msgsArea.innerHTML = `
+    <div class="chat-bubble-container" style="gap:12px;">
+      ${msgs.map(m => {
+        const isMe = m.sender === currentUser.name;
+        return `
+          <div class="chat-bubble ${isMe ? 'sent' : 'received'}">
+            <div>${escHtml(m.text)}</div>
+            <div class="chat-time" style="text-align: ${isMe ? 'left' : 'right'};">${m.date}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  msgsArea.scrollTop = msgsArea.scrollHeight;
+}
+
+function handleSendPrivateMessage(e) {
+  e.preventDefault();
+  if (!activeChatUser) return;
+  
+  const input = document.getElementById('chat-message-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const chats = getPrivateChats();
+  const key = [currentUser.name, activeChatUser].sort().join('_');
+  
+  if (!chats[key]) {
+    chats[key] = [];
+  }
+  
+  const now = new Date();
+  const dateStr = now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
+  
+  chats[key].push({
+    sender: currentUser.name,
+    text: text,
+    date: dateStr,
+    rawDate: now.toISOString()
+  });
+  
+  savePrivateChats(chats);
+  input.value = '';
+  
+  renderChatMessages();
+  renderInboxList(); // Update sidebar latest text
 }
 
 // Initial loads

@@ -377,7 +377,58 @@ function switchAdminTab(tabId, btnEl) {
     btnEl.classList.add('active');
   }
   if (tabId === 'pdfstore') renderPdfAdminList();
+  if (tabId === 'users') renderAdminUsersPage(1);
 
+}
+
+let currentUsersPage = 1;
+
+function renderAdminUsersPage(page = 1) {
+  currentUsersPage = page;
+  const listEl = document.getElementById('admin-users-list');
+  const paginationEl = document.getElementById('admin-users-pagination');
+  if(!listEl || !paginationEl) return;
+  
+  const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+  const usersArray = Object.keys(registeredUsers).map(name => ({
+    name,
+    password: registeredUsers[name].password,
+    gender: registeredUsers[name].gender || 'לא ידוע',
+    age: registeredUsers[name].age || 'לא הוזן',
+    date: registeredUsers[name].registrationDate || 'לא ידוע'
+  }));
+  
+  const limit = 20;
+  const totalPages = Math.max(1, Math.ceil(usersArray.length / limit));
+  const start = (page - 1) * limit;
+  const pageUsers = usersArray.slice(start, start + limit);
+  
+  if (usersArray.length === 0) {
+    listEl.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:#86868b;">אין משתמשים במערכת</td></tr>';
+  } else {
+    listEl.innerHTML = pageUsers.map((u, i) => `
+      <tr>
+        <td>${start + i + 1}</td>
+        <td><strong>${escHtml(u.name)}</strong></td>
+        <td>${escHtml(u.password)}</td>
+        <td>${escHtml(u.age)}</td>
+        <td>${escHtml(u.gender)}</td>
+        <td>${escHtml(u.date)}</td>
+      </tr>
+    `).join('');
+  }
+  
+  // Pagination
+  if (totalPages <= 1) {
+    paginationEl.innerHTML = '';
+  } else {
+    let btnHtml = '';
+    if (page > 1) btnHtml += `<button onclick="renderAdminUsersPage(${page - 1})" class="btn-secondary" style="padding: 6px 16px; border-radius:8px; font-size:0.9rem; border:1px solid #d2d2d7;">&rarr; הקודם</button>`;
+    btnHtml += `<span style="padding: 6px 16px; font-size:0.9rem; font-weight:700;">עמוד ${page} מתוך ${totalPages}</span>`;
+    if (page < totalPages) btnHtml += `<button onclick="renderAdminUsersPage(${page + 1})" class="btn-secondary" style="padding: 6px 16px; border-radius:8px; font-size:0.9rem; border:1px solid #d2d2d7;">הבא &larr;</button>`;
+    
+    paginationEl.innerHTML = btnHtml;
+  }
 }
 
 
@@ -1036,6 +1087,10 @@ function saveUserProfile() {
   const name = document.getElementById('join-name').value.trim();
   const password = document.getElementById('join-password').value.trim();
   const profilePic = document.getElementById('join-profile-pic').value;
+  const genderEl = document.getElementById('join-gender');
+  const gender = genderEl ? genderEl.value : 'לא מוגדר';
+  const ageEl = document.getElementById('join-age');
+  const age = ageEl ? ageEl.value : '';
   
   if (!name || !password) {
     showToast('❌ נא להזין שם וסיסמה כדי להמשיך');
@@ -1057,7 +1112,8 @@ function saveUserProfile() {
     }
   } else {
     // New user, register
-    registeredUsers[name] = { password, avatar: profilePic };
+    const joinDate = new Date().toLocaleDateString('he-IL');
+    registeredUsers[name] = { password, avatar: profilePic, gender: gender !== 'לא מוגדר' ? gender : 'לא ידוע', age: age || 'לא הוזן', registrationDate: joinDate };
     localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
     
     currentUser = { name, avatar: profilePic };

@@ -1342,12 +1342,8 @@ function submitContactForm(e) {
 }
 
 function initTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-  } else {
-    document.body.classList.remove('dark-theme');
-  }
+  document.body.classList.add('dark-theme');
+  localStorage.setItem('theme', 'dark');
 }
 
 function toggleTheme() {
@@ -2546,99 +2542,10 @@ function initBilingualAndSidebar() {
 
 function handleGlobalSearch(query) {
   const dropdown = document.getElementById('global-search-results');
-  if (!dropdown) return;
-  
-  const trimmed = query.trim().toLowerCase();
-  if (!trimmed) {
+  if (dropdown) {
     dropdown.classList.add('hidden');
     dropdown.innerHTML = '';
-    return;
   }
-  
-  // 1. Filter articles
-  const matchingArticles = newsArticles.filter(a => {
-    const titleMatch = (a.title && a.title.toLowerCase().includes(trimmed));
-    const contentMatch = (a.content && a.content.toLowerCase().includes(trimmed));
-    const catMatch = (a.category && a.category.toLowerCase().includes(trimmed));
-    return titleMatch || contentMatch || catMatch;
-  });
-  
-  // 2. Filter user photos (PDF store items)
-  const pdfItems = getPdfItems();
-  const matchingPdf = pdfItems.filter(item => {
-    const titleMatch = (item.title && item.title.toLowerCase().includes(trimmed));
-    const descMatch = (item.desc && item.desc.toLowerCase().includes(trimmed));
-    const typeMatch = (item.type && item.type.toLowerCase().includes(trimmed));
-    return titleMatch || descMatch || typeMatch;
-  });
-  
-  dropdown.classList.remove('hidden');
-  
-  if (matchingArticles.length === 0 && matchingPdf.length === 0) {
-    dropdown.innerHTML = `
-      <div class="search-empty-state">
-        <i class="fa-regular fa-face-frown" style="font-size:1.8rem; margin-bottom:8px; display:block; color:var(--text-muted);"></i>
-        ${currentLang === 'en' ? 'No results found for' : 'לא נמצאו תוצאות עבור'} "<strong>${escHtml(query)}</strong>"
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '';
-  
-  // Render Articles section
-  if (matchingArticles.length > 0) {
-    html += `
-      <div class="search-section">
-        <div class="search-section-header">
-          <i class="fa-solid fa-book-open"></i> ${currentLang === 'en' ? 'Stories & Articles' : 'סיפורים וכתבות'} (${matchingArticles.length})
-        </div>
-    `;
-    matchingArticles.forEach(a => {
-      const trans = (currentLang === 'en' && articleTranslations[a.id]) ? articleTranslations[a.id] : {};
-      const title = trans.title || a.title;
-      const snippet = trans.snippet || a.snippet || '';
-      
-      html += `
-        <div class="search-result-item" onclick="selectSearchArticle(${a.id})">
-          <div class="search-result-thumb" style="background-image: url('${a.image}')"></div>
-          <div class="search-result-info">
-            <div class="search-result-title">${escHtml(title)}</div>
-            <div class="search-result-desc">${escHtml(snippet)}</div>
-          </div>
-        </div>
-      `;
-    });
-    html += `</div>`;
-  }
-  
-  // Render User Photos / Products section
-  if (matchingPdf.length > 0) {
-    html += `
-      <div class="search-section" style="margin-top: 8px;">
-        <div class="search-section-header">
-          <i class="fa-solid fa-camera"></i> ${currentLang === 'en' ? 'User Photos & Products' : 'תמונות גולשים וחנות'} (${matchingPdf.length})
-        </div>
-    `;
-    matchingPdf.forEach(item => {
-      const pdfItemsAll = getPdfItems();
-      const originalIndex = pdfItemsAll.findIndex(x => x.title === item.title && x.desc === item.desc);
-      const img = item.images && item.images[0] ? item.images[0] : (item.image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c');
-      
-      html += `
-        <div class="search-result-item" onclick="selectSearchProduct(${originalIndex})">
-          <div class="search-result-thumb" style="background-image: url('${img}')"></div>
-          <div class="search-result-info">
-            <div class="search-result-title">${escHtml(item.title)}</div>
-            <div class="search-result-desc">${escHtml(item.desc || '')}</div>
-          </div>
-        </div>
-      `;
-    });
-    html += `</div>`;
-  }
-  
-  dropdown.innerHTML = html;
 }
 
 function selectSearchArticle(id) {

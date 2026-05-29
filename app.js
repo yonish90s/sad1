@@ -11,7 +11,74 @@ const defaultNewsArticles = [
   { id: 8, title: 'טלגרם מציגה: עורך טקסט מבוסס AI, שדרוג לסקרים ותמיכה בתמונות חיים', image: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=800', author: 'מערכת החדשות', time: 'היום, 09:19', snippet: 'גרסת טלגרם החדשה כוללת חידושים בולטים הנוגעים לכלי הבינה המלאכותית ולנוחות השיתוף בפלטפורמה.', category: 'אפליקציות' }
 ];
 
-const defaultPdfStoreItems = [];
+const defaultPdfStoreItems = [
+  {
+    title: 'סופשבוע מושלם בנואבה דה צ\'יאפה - מקסיקו',
+    contact: 'Ronnie_M',
+    desc: 'שיתוף של תמונות ומסמכי מסלול מטיול המקסיקו המטורף שלי! נופים, מחירים והמלצות חמות.',
+    age: '24',
+    location: 'מקסיקו סיטי',
+    type: 'תוכן גולשים',
+    images: ['https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '29.05.2026'
+  },
+  {
+    title: 'מדריך צילום בטלפון הנייד - גרסה מלאה',
+    contact: 'Alon_Visuals',
+    desc: 'איך להוציא תמונות קולנועיות מהטלפון שלך. כולל הגדרות תאורה וצבע.',
+    age: '29',
+    location: 'תל אביב',
+    type: 'מדריך',
+    images: ['https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&q=80&w=800'],
+    price: '15',
+    date: '28.05.2026'
+  },
+  {
+    title: '4K Cute Pajama Haul + Hello Kitty Bikini Try-On',
+    contact: 'baby_carrie',
+    desc: 'סרטון פרימיום קצר של מדידות והמלצות אופנה.',
+    age: '21',
+    location: 'לוס אנג\'לס',
+    type: 'סרטון',
+    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '27.05.2026'
+  },
+  {
+    title: 'אוסף פילטרים מקצועיים ל-Lightroom Mobile',
+    contact: 'Lior_Presets',
+    desc: 'חבילה של 5 פילטרים בעיצוב Apple כהה ויוקרתי לעריכה מהירה.',
+    age: '26',
+    location: 'חיפה',
+    type: 'תוכנה',
+    images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800'],
+    price: '25',
+    date: '26.05.2026'
+  },
+  {
+    title: 'ספר מסע: הרפתקה בטרק האנאפורנה - נפאל',
+    contact: 'Amit_Trek',
+    desc: 'יומן מסע מפורט עם טיפים על הוצאות, ציוד, ומפות לאופליין.',
+    age: '25',
+    location: 'נפאל',
+    type: 'PDF',
+    images: ['https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '25.05.2026'
+  },
+  {
+    title: 'קובץ תרשימים וארכיטקטורה למערכות מידע',
+    contact: 'TechBlueprint',
+    desc: 'תרשימי זרימה מקצועיים ותבניות עבודה מוכנות לשימוש.',
+    age: '32',
+    location: 'הרצליה',
+    type: 'קובץ',
+    images: ['https://images.unsplash.com/photo-1544391490-01c6db9f5a70?auto=format&fit=crop&q=80&w=800'],
+    price: '49',
+    date: '24.05.2026'
+  }
+];
 
 
 
@@ -1574,10 +1641,7 @@ async function submitUserPdfItem(isScheduled = false) {
     return;
   }
   
-  if (selectedUserPdfImages.length === 0) {
-    showToast('❌ נא לבחור לפחות תמונה אחת להמחשה');
-    return;
-  }
+  // Image upload is now optional. If empty, the grid renderer will automatically assign a gorgeous fallback cover!
 
   let scheduledDateStr = '';
   if (isScheduled) {
@@ -1644,6 +1708,8 @@ async function submitUserPdfItem(isScheduled = false) {
     renderUserPdfPreviews();
     
     // Update view
+    selectedStoreCategory = 'all';
+    if (typeof renderStoreCategoryBar === 'function') renderStoreCategoryBar();
     renderPdfStoreGrid();
     
     // Hide loading overlay

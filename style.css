@@ -1407,7 +1407,8 @@ body.dark-theme .pdf-card-action-btn.price-free:hover {
 /* PRODUCT DETAIL PAGE (PDP) */
 .product-pdp-container {
   display: flex;
-  gap: 48px;
+  flex-direction: column;
+  gap: 32px;
   background: #fff;
   padding: 40px;
   border-radius: 28px;
@@ -1493,34 +1494,35 @@ body.dark-theme .pdf-card-action-btn.price-free:hover {
 }
 
 .product-visual-column {
-  flex: 1.2;
+  width: 100%;
   display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
 .main-image-wrapper {
-  flex: 1;
-  background: #fbfbfd;
+  width: 100%;
+  background: #0a0a0a;
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid #f2f2f2;
-  min-height: 400px;
+  border: 1px solid rgba(255,255,255,0.06);
+  min-height: 500px;
 }
 
 .main-image-wrapper img {
-  max-width: 100%;
-  max-height: 500px;
+  width: 100%;
+  max-height: 700px;
   object-fit: contain;
 }
 
 .thumbnail-list {
-  width: 80px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
+  overflow-x: auto;
 }
 
 .pdp-thumb {

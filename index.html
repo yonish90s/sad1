@@ -136,11 +136,30 @@
       </button>
 
       <!-- User Account Section -->
-      <div id="user-nav-section" style="display: flex; align-items: center;">
-        <button id="btn-inbox-nav" onclick="showInboxPage()" style="display: none; padding: 6px 16px; height: 32px; border-radius: 980px; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border-subtle); cursor: pointer; color: #1d1d1f; font-weight: 600; font-size: 0.85rem; margin-left: 8px;">
-          <i class="fa-regular fa-comment-dots"></i> <span id="btn-inbox-text">הודעות</span>
-          <span id="inbox-unread-badge" style="display:none; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; justify-content: center; align-items: center;"></span>
-        </button>
+      <div id="user-nav-section" style="display: flex; align-items: center; gap: 10px;">
+        
+        <!-- Action Row: Inbox, Bell, Bookmark -->
+        <div id="navbar-action-icons" style="display: none; align-items: center; gap: 10px; margin-left: 8px;">
+          
+          <!-- Inbox Button -->
+          <button id="btn-inbox-nav" onclick="showInboxPage()" class="apple-icon-btn" style="position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+            <i class="fa-solid fa-message" style="font-size: 1.05rem;"></i>
+            <span id="inbox-unread-badge" style="display:none; position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 0.65rem; justify-content: center; align-items: center; font-weight: 800; border: 1.5px solid #000;"></span>
+          </button>
+
+          <!-- Notification Bell -->
+          <button id="btn-bell-nav" onclick="showNotifications()" class="apple-icon-btn" style="position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+            <i class="fa-solid fa-bell" style="font-size: 1.05rem;"></i>
+            <span id="bell-badge" style="position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 0.65rem; display: flex; justify-content: center; align-items: center; font-weight: 800; border: 1.5px solid #000;">3</span>
+          </button>
+
+          <!-- Bookmark -->
+          <button id="btn-bookmark-nav" onclick="showSavedItems()" class="apple-icon-btn" style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+            <i class="fa-solid fa-bookmark" style="font-size: 1.05rem;"></i>
+          </button>
+
+        </div>
+
         <div id="user-profile-badge" onclick="handleProfileBadgeClick()" style="display: none; cursor: pointer; border: 1px solid var(--border-subtle); background: var(--bg-main); padding: 4px 10px; border-radius: 980px; align-items: center; gap: 8px;">
           <img id="user-badge-avatar" class="user-avatar-small" src="">
           <span id="user-badge-name" style="font-size: 0.85rem; font-weight: 700;"></span>
@@ -190,70 +209,36 @@
 <!-- PDF STORE PAGE -->
 <div id="page-pdf-store" class="page" style="max-width: 1280px; padding-top: 40px;">
   
-  <!-- Premium Video/Photo Featured Banner -->
-  <div class="store-featured-banner" style="position:relative; background:#0f1013; height:380px; border-radius:24px; overflow:hidden; margin-bottom:48px; box-shadow:var(--shadow-soft); display:flex; flex-direction:column;">
-    
-    <!-- Video background (Looping & silent!) -->
-    <video autoplay loop muted playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.35; z-index:1; pointer-events:none;">
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-loop-41859-large.mp4" type="video/mp4">
-    </video>
-    
-    <!-- Top Horizontal Ticker Marquee -->
-    <div class="store-ticker-wrap" style="position:relative; z-index:2; background:rgba(0,0,0,0.6); padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08); overflow:hidden;">
-      <div class="store-ticker-track" style="display:flex; gap:50px; white-space:nowrap; animation: storeTickerMove 25s linear infinite; font-size:0.85rem; font-weight:700; color:#fff; text-transform:uppercase;">
-        <span>🔥 SOLD! Vid to Bobloblaw88</span>
-        <span>⭐ SOLD! Vid to KhaiHola</span>
-        <span>💎 SOLD! Vid to el3mntzzz</span>
-        <span>🚀 SOLD! Vid to tadk53</span>
-        <span>🔥 SOLD! Vid to Bobloblaw88</span>
-        <span>⭐ SOLD! Vid to KhaiHola</span>
-        <span>💎 SOLD! Vid to el3mntzzz</span>
-        <span>🚀 SOLD! Vid to tadk53</span>
-      </div>
-    </div>
-    
-    <!-- Slider Content Panel -->
-    <div style="position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 60px;">
-      
-      <!-- Side cards overlay simulation (left/right depth) -->
-      <div class="side-card-sim left" style="display:flex; gap:16px; opacity:0.4; pointer-events:none;">
-        <div style="width:70px; height:180px; background:#2c2c2e; border-radius:16px; transform: rotate(-5deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
-        <div style="width:90px; height:200px; background:#1c1c1e; border-radius:16px; transform: rotate(-3deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
-      </div>
-      
-      <!-- Center featured content details -->
-      <div style="display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center; max-width:550px; margin:0 auto;">
-        <span style="background:#db2777; color:#fff; font-size:0.75rem; font-weight:800; padding:6px 16px; border-radius:980px; text-transform:uppercase; letter-spacing:0.05em;">Top Video of the Day</span>
-        
-        <!-- User Profile Header -->
-        <div style="display:flex; align-items:center; gap:12px;">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150" style="width:48px; height:48px; border-radius:50%; border:2px solid #fff; object-fit:cover;" />
-          <div style="text-align:right;">
-            <div style="color:#fff; font-weight:800; font-size:1.1rem;">baby_carrie</div>
-            <div style="color:#86868b; font-size:0.85rem;">@baby_carrie</div>
-          </div>
-        </div>
-        
-        <h2 style="color:#fff; font-size:1.6rem; font-weight:900; line-height:1.3; margin:0;">4K Cute Pajama Haul + Hello Kitty Bikini Try-On</h2>
-        
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span style="color:#a855f7; font-weight:900; font-size:1.2rem;">FREE</span>
-          <span style="color:#86868b; font-size:0.9rem; display:flex; align-items:center; gap:4px;"><i class="fa-regular fa-eye"></i> 7.7K views</span>
-        </div>
-      </div>
-      
-      <!-- Side cards overlay simulation (right depth) -->
-      <div class="side-card-sim right" style="display:flex; gap:16px; opacity:0.4; pointer-events:none;">
-        <div style="width:90px; height:200px; background:#1c1c1e; border-radius:16px; transform: rotate(3deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
-        <div style="width:70px; height:180px; background:#2c2c2e; border-radius:16px; transform: rotate(5deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
-      </div>
-      
-      <!-- Navigation Arrows -->
-      <button class="banner-arrow prev" style="position:absolute; left:20px; top:55%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#fff; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all 0.2s;"><i class="fa-solid fa-chevron-left"></i></button>
-      <button class="banner-arrow next" style="position:absolute; right:20px; top:55%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#fff; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all 0.2s;"><i class="fa-solid fa-chevron-right"></i></button>
-      
+  <!-- Top Horizontal Ticker Marquee -->
+  <div class="store-ticker-wrap" style="position:relative; z-index:2; background:rgba(0,0,0,0.75); padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08); overflow:hidden; border-radius:12px; margin-bottom:24px;">
+    <div class="store-ticker-track" style="display:flex; gap:50px; white-space:nowrap; animation: storeTickerMove 25s linear infinite; font-size:0.85rem; font-weight:700; color:#fff; text-transform:uppercase;">
+      <span>🔥 SOLD! Vid to Bobloblaw88</span>
+      <span>⭐ SOLD! Vid to KhaiHola</span>
+      <span>💎 SOLD! Vid to el3mntzzz</span>
+      <span>🚀 SOLD! Vid to tadk53</span>
+      <span>🔥 SOLD! Vid to Bobloblaw88</span>
+      <span>⭐ SOLD! Vid to KhaiHola</span>
+      <span>💎 SOLD! Vid to el3mntzzz</span>
+      <span>🚀 SOLD! Vid to tadk53</span>
     </div>
   </div>
+
+  <!-- Featured 3-Card Auto-Sliding Carousel -->
+  <section class="store-carousel-container" id="store-carousel-container" style="position: relative; overflow: hidden; border-radius: 24px; margin-bottom: 40px;">
+    <div class="carousel-viewport" style="overflow: hidden; width: 100%; border-radius: 24px;">
+      <div class="store-carousel-track" id="store-carousel-track" style="display: flex; gap: 21px; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); width: 100%;">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    
+    <!-- Navigation Arrows -->
+    <button onclick="slideStoreCarouselPrev()" class="carousel-arrow prev" style="position: absolute; top: 50%; left: 20px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid var(--border-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s; color:#1d1d1f;">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button onclick="slideStoreCarouselNext()" class="carousel-arrow next" style="position: absolute; top: 50%; right: 20px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid var(--border-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s; color:#1d1d1f;">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </section>
   
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding:0 4px;">
     <h2 id="store-title-text" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -0.04em; margin: 0;">תמונות גולשים פופולריות</h2>
@@ -597,13 +582,7 @@
   <button class="back-btn" onclick="goBack()" style="margin-bottom: 40px; border:none; background:none; color:#0066cc; font-weight:600; cursor:pointer; font-size:1rem;">&rarr; חזור לחנות</button>
   
   <div class="product-pdp-container">
-    <!-- Left: Info -->
-    <div class="product-info-column">
-      <h1 id="pdp-title" class="pdp-title">שם המוצר יופיע כאן</h1>
-      <p id="pdp-desc" class="pdp-description">תיאור המוצר המפורט יופיע כאן...</p>
-    </div>
-
-    <!-- Right: Visuals -->
+    <!-- Top: Visuals -->
     <div class="product-visual-column">
       <div class="main-image-wrapper">
         <img id="pdp-main-image" src="" alt="תמונת מוצר" />
@@ -611,6 +590,12 @@
       <div class="thumbnail-list" id="pdp-thumbnails">
         <!-- Thumbnails -->
       </div>
+    </div>
+
+    <!-- Bottom: Info -->
+    <div class="product-info-column">
+      <h1 id="pdp-title" class="pdp-title">שם המוצר יופיע כאן</h1>
+      <p id="pdp-desc" class="pdp-description">תיאור המוצר המפורט יופיע כאן...</p>
     </div>
   </div>
 

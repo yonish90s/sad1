@@ -278,6 +278,7 @@ function showPage(page) {
 
   if (page === 'home') renderNewsLayout();
   if (page === 'pdf-store') {
+    renderStoreCarousel();
     renderPdfStoreGrid();
     renderStoreCategoryBar();
   }
@@ -937,6 +938,107 @@ function savePdfItems(items) {
   localStorage.setItem('pdfStoreItems', JSON.stringify(items));
 }
 
+// ========== STORE 3-CARD CAROUSEL ==========
+let storeSlideIndex = 0;
+let storeCarouselInterval = null;
+
+function renderStoreCarousel() {
+  const track = document.getElementById('store-carousel-track');
+  const container = document.getElementById('store-carousel-container');
+  if (!track || !container) return;
+  
+  const items = getPdfItems();
+  if (items.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  
+  container.style.display = 'block';
+  
+  // Control arrows visibility
+  const prevArrow = container.querySelector('.carousel-arrow.prev');
+  const nextArrow = container.querySelector('.carousel-arrow.next');
+  if (prevArrow && nextArrow) {
+    if (items.length <= 3) {
+      prevArrow.style.display = 'none';
+      nextArrow.style.display = 'none';
+    } else {
+      prevArrow.style.display = 'flex';
+      nextArrow.style.display = 'flex';
+    }
+  }
+  
+  const cidMap = { 'PDF': '1544716278-ca5e3f4abd8c', 'תוכנה': '1517694712202-14dd9538aa97', 'סרטון': '1492724441997-5dc865305da7', 'קובץ': '1544391490-01c6db9f5a70', 'מדריך': '1497633762265-9d179a990aa6' };
+  
+  track.innerHTML = items.map((item, i) => {
+    const cid = cidMap[item.type] || cidMap['PDF'];
+    const fallback = `https://images.unsplash.com/photo-${cid}?auto=format&fit=crop&q=80&w=800`;
+    const mainImg = (item.images && item.images.length > 0) ? item.images[0] : fallback;
+    
+    return `
+      <div class="carousel-slide" onclick="showProductDetail(${i})" style="flex: 0 0 calc(33.333% - 14px); max-width: calc(33.333% - 14px); position: relative; aspect-ratio: 16/10; min-height: 280px; cursor: pointer; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div class="slide-bg" style="background-image: url('${mainImg}'); width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.8s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'"></div>
+        <div class="slide-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.15) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; box-sizing: border-box;">
+          <div style="align-self: flex-start; background: #0071e3; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; z-index: 2;">
+            ${escHtml(item.type || 'קובץ')}
+          </div>
+          <h3 style="color: #fff; font-size: 1.25rem; font-weight: 800; line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 5.8em; text-overflow: ellipsis; text-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2;">
+            ${escHtml(item.title)}
+          </h3>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  storeSlideIndex = 0;
+  updateStoreCarouselPosition();
+  
+  if (items.length > 3) {
+    startStoreCarouselAutoCycle();
+  } else {
+    if (storeCarouselInterval) clearInterval(storeCarouselInterval);
+  }
+}
+
+function startStoreCarouselAutoCycle() {
+  if (storeCarouselInterval) clearInterval(storeCarouselInterval);
+  storeCarouselInterval = setInterval(() => {
+    slideStoreCarouselNext();
+  }, 10000); // 10 seconds
+}
+
+function slideStoreCarouselNext() {
+  const items = getPdfItems();
+  if (items.length <= 3) return;
+  const maxIndex = items.length - 3;
+  storeSlideIndex = (storeSlideIndex + 1) > maxIndex ? 0 : (storeSlideIndex + 1);
+  updateStoreCarouselPosition();
+  startStoreCarouselAutoCycle();
+}
+
+function slideStoreCarouselPrev() {
+  const items = getPdfItems();
+  if (items.length <= 3) return;
+  const maxIndex = items.length - 3;
+  storeSlideIndex = (storeSlideIndex - 1) < 0 ? maxIndex : (storeSlideIndex - 1);
+  updateStoreCarouselPosition();
+  startStoreCarouselAutoCycle();
+}
+
+function updateStoreCarouselPosition() {
+  const track = document.getElementById('store-carousel-track');
+  if (!track) return;
+  
+  const dir = document.documentElement.dir || 'rtl';
+  const step = `calc(${storeSlideIndex} * (33.333% + 7px))`;
+  
+  if (dir === 'rtl') {
+    track.style.transform = `translateX(${step})`;
+  } else {
+    track.style.transform = `translateX(-${step})`;
+  }
+}
+
 function renderPdfStoreGrid() {
   const grid = document.getElementById('pdf-store-grid');
   if (!grid) return;
@@ -1467,6 +1569,7 @@ function updateUserUI() {
   const btnLogoutNav = document.getElementById('btn-logout-nav');
   const btnInboxNav = document.getElementById('btn-inbox-nav');
   
+  const navbarActionIcons = document.getElementById('navbar-action-icons');
   if (!btnJoin || !profileBadge || !btnLogoutNav) return;
 
   const isUserLoggedIn = !!currentUser;
@@ -1476,6 +1579,7 @@ function updateUserUI() {
     btnJoin.style.display = 'none';
     profileBadge.style.display = 'flex';
     btnLogoutNav.style.display = 'block';
+    if(navbarActionIcons) navbarActionIcons.style.display = 'flex';
     if(btnInboxNav && isUserLoggedIn) btnInboxNav.style.display = 'flex';
 
     if (isAdminLoggedIn && !isUserLoggedIn) {
@@ -1502,6 +1606,7 @@ function updateUserUI() {
     btnJoin.style.display = 'block';
     profileBadge.style.display = 'none';
     btnLogoutNav.style.display = 'none';
+    if(navbarActionIcons) navbarActionIcons.style.display = 'none';
     if(btnInboxNav) btnInboxNav.style.display = 'none';
     
     document.querySelectorAll('[id$="-comment-input-area"]').forEach(el => el.style.display = 'none');
@@ -2631,6 +2736,16 @@ function selectStoreCategory(cat) {
   selectedStoreCategory = cat;
   renderStoreCategoryBar();
   renderPdfStoreGrid();
+}
+
+// ========== NOTIFICATIONS ==========
+function showNotifications() {
+  showToast('🔔 אין התראות חדשות כרגע');
+}
+
+// ========== SAVED ITEMS ==========
+function showSavedItems() {
+  showToast('🔖 אין פריטים שמורים כרגע');
 }
 
 // ========== INITIALIZATION AND STARTUP ==========

@@ -1576,20 +1576,14 @@ setTimeout(updateUserUI, 100);
 let selectedUserPdfImages = [null, null, null, null];
 let activeUserSlot = 0;
 
-function triggerUserSlotUpload(slotIndex) {
-  activeUserSlot = slotIndex;
-  const input = document.getElementById('user-pdf-files');
-  if (input) input.click();
-}
-
-function handleUserPdfFileSelection(event) {
+function handleUserPdfFileSelectionDirect(slotIndex, event) {
   const file = event.target.files[0];
   if (!file) return;
   
   const reader = new FileReader();
   reader.onload = (e) => {
     const b64 = e.target.result;
-    selectedUserPdfImages[activeUserSlot] = b64;
+    selectedUserPdfImages[slotIndex] = b64;
     renderUserPdfSlots();
   };
   reader.readAsDataURL(file);
@@ -1618,10 +1612,11 @@ function renderUserPdfSlots() {
       slotEl.style.borderColor = 'rgba(255,255,255,0.2)';
     } else {
       slotEl.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #86868b;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #86868b; pointer-events: none;">
           <i class="fa-solid fa-camera" style="font-size: 1.2rem; color: #0071e3;"></i>
           <span style="font-size: 0.65rem; font-weight: 700;">+ תמונה ${i+1}</span>
         </div>
+        <input type="file" accept="image/*" onchange="handleUserPdfFileSelectionDirect(${i}, event)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
       `;
       slotEl.style.borderStyle = 'dashed';
       slotEl.style.borderColor = 'rgba(255,255,255,0.15)';

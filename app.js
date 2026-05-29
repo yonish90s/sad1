@@ -1565,45 +1565,60 @@ let currentArticleId = null;
 // Initial call
 setTimeout(updateUserUI, 100);
 // ========== USER PDF UPLOADS ==========
-let selectedUserPdfImages = [];
+let selectedUserPdfImages = [null, null, null, null];
+let activeUserSlot = 0;
+
+function triggerUserSlotUpload(slotIndex) {
+  activeUserSlot = slotIndex;
+  const input = document.getElementById('user-pdf-files');
+  if (input) input.click();
+}
 
 function handleUserPdfFileSelection(event) {
-  const files = Array.from(event.target.files);
-  const previewContainer = document.getElementById('user-pdf-image-preview');
+  const file = event.target.files[0];
+  if (!file) return;
   
-  // Limit to 4 images
-  const remaining = 4 - selectedUserPdfImages.length;
-  const toProcess = files.slice(0, remaining);
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const b64 = e.target.result;
+    selectedUserPdfImages[activeUserSlot] = b64;
+    renderUserPdfSlots();
+  };
+  reader.readAsDataURL(file);
   
-  toProcess.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const b64 = e.target.result;
-      selectedUserPdfImages.push(b64);
-      renderUserPdfPreviews();
-    };
-    reader.readAsDataURL(file);
-  });
-  
-  // Clear input so same file can be picked again if removed
   event.target.value = '';
 }
 
-function renderUserPdfPreviews() {
-  const container = document.getElementById('user-pdf-image-preview');
-  if (!container) return;
-  
-  container.innerHTML = selectedUserPdfImages.map((img, i) => `
-    <div class="preview-item">
-      <img src="${img}" alt="Preview ${i}" />
-      <button class="remove-img-btn" onclick="removeUserPdfImage(${i})">✕</button>
-    </div>
-  `).join('');
+function removeUserSlotImage(slotIndex, event) {
+  if (event) event.stopPropagation(); // Prevent opening the upload window on overlay click
+  selectedUserPdfImages[slotIndex] = null;
+  renderUserPdfSlots();
 }
 
-function removeUserPdfImage(index) {
-  selectedUserPdfImages.splice(index, 1);
-  renderUserPdfPreviews();
+function renderUserPdfSlots() {
+  for (let i = 0; i < 4; i++) {
+    const slotEl = document.getElementById(`user-photo-slot-${i}`);
+    if (!slotEl) continue;
+    
+    const imgData = selectedUserPdfImages[i];
+    if (imgData) {
+      slotEl.innerHTML = `
+        <img src="${imgData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;" />
+        <button type="button" class="remove-img-btn" onclick="removeUserSlotImage(${i}, event)" style="position: absolute; top: -6px; right: -6px; background: #ff3b30; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 10;">✕</button>
+      `;
+      slotEl.style.borderStyle = 'solid';
+      slotEl.style.borderColor = 'rgba(255,255,255,0.2)';
+    } else {
+      slotEl.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #86868b;">
+          <i class="fa-solid fa-camera" style="font-size: 1.2rem; color: #0071e3;"></i>
+          <span style="font-size: 0.65rem; font-weight: 700;">+ תמונה ${i+1}</span>
+        </div>
+      `;
+      slotEl.style.borderStyle = 'dashed';
+      slotEl.style.borderColor = 'rgba(255,255,255,0.15)';
+    }
+  }
 }
 
 function toggleScheduleSection() {
@@ -1688,7 +1703,7 @@ async function submitUserPdfItem(isScheduled = false) {
       age: age,
       location: location,
       type: 'תוכן גולשים',
-      images: selectedUserPdfImages,
+      images: selectedUserPdfImages.filter(Boolean),
       link: '#',
       date: isScheduled ? `מתוזמן ל: ${scheduledDateStr}` : new Date().toLocaleDateString('he-IL'),
       author: currentUser ? currentUser.name : null
@@ -1704,8 +1719,8 @@ async function submitUserPdfItem(isScheduled = false) {
     document.getElementById('user-pdf-desc').value = '';
     document.getElementById('user-pdf-age').value = '';
     document.getElementById('user-pdf-location').value = '';
-    selectedUserPdfImages = [];
-    renderUserPdfPreviews();
+    selectedUserPdfImages = [null, null, null, null];
+    if (typeof renderUserPdfSlots === 'function') renderUserPdfSlots();
     
     // Update view
     selectedStoreCategory = 'all';
@@ -2630,6 +2645,7 @@ function openUploadModal() {
   const modal = document.getElementById('upload-photo-modal');
   if (modal) {
     modal.classList.add('active');
+    if (typeof renderUserPdfSlots === 'function') renderUserPdfSlots();
   }
 }
 

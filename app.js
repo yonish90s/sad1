@@ -1358,14 +1358,6 @@ function toggleTheme() {
   showToast(isDark ? '🌙 מצב כהה הופעל' : '☀️ מצב בהיר הופעל');
 }
 
-// ========== INIT ==========
-initTheme();
-showPage('home');
-
-
-
-
-
 // ========== USER & COMMENTS LOGIC ==========
 let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
@@ -1603,8 +1595,6 @@ function renderComments(type, targetId) {
 // Global variable for current article
 let currentArticleId = null;
 
-// Initial call
-setTimeout(updateUserUI, 100);
 // ========== USER PDF UPLOADS ==========
 let selectedUserPdfImages = [null, null, null, null];
 let activeUserSlot = 0;
@@ -2750,3 +2740,10 @@ function selectStoreCategory(cat) {
   renderStoreCategoryBar();
   renderPdfStoreGrid();
 }
+
+// ========== INITIALIZATION AND STARTUP ==========
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  showPage('home');
+  updateUserUI();
+});

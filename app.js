@@ -1327,7 +1327,7 @@ function toggleTheme() {
 
 // ========== INIT ==========
 initTheme();
-showPage('pdf-store');
+showPage('home');
 
 
 

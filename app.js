@@ -1074,38 +1074,34 @@ function renderPdfStoreGrid() {
     const timeStr = item.date || 'היום';
     
     return `
-      <div class="pdf-card" style="display:flex; flex-direction:column; align-items:stretch; gap:0; overflow:hidden; border-radius:20px; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor:pointer;">
+      <div class="pdf-card" style="display:flex; flex-direction:column; gap:0; overflow:hidden; border-radius:16px; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor:pointer;">
         
-        <!-- Large Image -->
-        <div onclick="showProductDetail(${i})" class="pdf-card-media-wrapper" style="position:relative; width:100%; height:280px; overflow:hidden; background:#000; border-radius:16px;">
+        <!-- Image -->
+        <div onclick="showProductDetail(${i})" class="pdf-card-media-wrapper" style="width:100%; height:180px; overflow:hidden; background:#000; border-radius:14px;">
           <img src="${mainImg}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" />
         </div>
         
         <!-- Title -->
-        <div style="padding:16px 4px 0 4px; text-align:right;">
-          <h3 onclick="showProductDetail(${i})" style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">
-            ${escHtml(item.title)}
-          </h3>
-        </div>
+        <h3 onclick="showProductDetail(${i})" style="font-size:1rem; font-weight:800; color:var(--text-main); margin:0; padding:12px 2px 0; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; text-align:right;">
+          ${escHtml(item.title)}
+        </h3>
 
         <!-- Author + Time -->
-        <div style="padding:8px 4px 0 4px; display:flex; align-items:center; gap:8px; justify-content:flex-end; direction:rtl;">
-          <span style="font-weight:700; font-size:0.88rem; color:#0071e3;">${escHtml(contactName)}</span>
-          <span style="color:var(--text-muted); font-size:0.82rem;">|</span>
-          <span style="color:var(--text-muted); font-size:0.82rem;">${escHtml(timeStr)}</span>
+        <div style="padding:6px 2px 0; display:flex; align-items:center; gap:6px; justify-content:flex-end; direction:rtl;">
+          <span style="font-weight:700; font-size:0.8rem; color:#0071e3;">${escHtml(contactName)}</span>
+          <span style="color:var(--text-muted); font-size:0.78rem;">|</span>
+          <span style="color:var(--text-muted); font-size:0.78rem;">${escHtml(timeStr)}</span>
         </div>
 
-        <!-- Description snippet -->
-        <div onclick="showProductDetail(${i})" style="padding:10px 4px 0 4px; text-align:right;">
-          <p style="font-size:0.92rem; line-height:1.6; color:var(--text-muted); margin:0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">
-            ${escHtml(desc)}
-          </p>
-        </div>
+        <!-- Description -->
+        <p onclick="showProductDetail(${i})" style="font-size:0.85rem; line-height:1.5; color:var(--text-muted); margin:0; padding:6px 2px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; text-align:right;">
+          ${escHtml(desc)}
+        </p>
 
-        <!-- Send Message Button -->
-        <div style="padding:14px 4px 4px 4px; display:flex; justify-content:flex-end;">
-          <button onclick="event.stopPropagation(); openChatWith('${escHtml(contactName)}')" style="padding:8px 20px; border-radius:980px; background:#1d1d1f; color:#fff; border:none; font-weight:700; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; font-family:inherit;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1d1d1f'">
-            <i class="fa-solid fa-message" style="font-size:0.75rem;"></i>
+        <!-- Send Message -->
+        <div style="padding:10px 2px 2px; display:flex; justify-content:flex-end;">
+          <button onclick="event.stopPropagation(); openChatWith('${escHtml(contactName)}')" style="padding:6px 14px; border-radius:980px; background:#1d1d1f; color:#fff; border:none; font-weight:700; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s; font-family:inherit;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1d1d1f'">
+            <i class="fa-solid fa-message" style="font-size:0.65rem;"></i>
             שלח הודעה
           </button>
         </div>

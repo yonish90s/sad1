@@ -12,25 +12,129 @@
 </head>
 <body>
 
+<!-- SIDEBAR DRAWER (Collapsible Dashboard) -->
+<div id="dashboard-sidebar" class="dashboard-sidebar">
+  <div class="sidebar-inner">
+    
+    <!-- Top Header -->
+    <div class="sidebar-header-main">
+      <h2 id="sidebar-dashboard-title">My Dashboard</h2>
+      <button id="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" class="collapse-circle-btn">
+        <i class="fa-solid fa-chevron-left" id="collapse-btn-icon"></i>
+      </button>
+    </div>
+
+    <!-- Weather Widget -->
+    <div class="sidebar-weather-card">
+      <div class="weather-info-left">
+        <div id="weather-city" class="weather-city">וושינגטון</div>
+        <div id="weather-temp" class="weather-temp">16°C</div>
+      </div>
+      <div class="weather-icon-right">
+        <i class="fa-solid fa-sun weather-sun-gear"></i>
+      </div>
+    </div>
+
+    <!-- Main Navigation Menu -->
+    <nav class="sidebar-nav-menu">
+      <button id="sidebar-link-home" onclick="handleSidebarNavigation('home')" class="sidebar-menu-item active">
+        <i class="fa-solid fa-house menu-item-icon"></i>
+        <span class="menu-item-text" id="sidebar-text-stories">כתבות</span>
+      </button>
+      <button id="sidebar-link-store" onclick="handleSidebarNavigation('pdf-store')" class="sidebar-menu-item">
+        <i class="fa-solid fa-bag-shopping menu-item-icon"></i>
+        <span class="menu-item-text" id="sidebar-text-store">Store</span>
+      </button>
+      <button id="sidebar-link-graphs" onclick="handleSidebarNavigation('graphs')" class="sidebar-menu-item">
+        <i class="fa-solid fa-chart-line menu-item-icon"></i>
+        <span class="menu-item-text" id="sidebar-text-graphs">Graphs & Data</span>
+      </button>
+      <button id="sidebar-link-premium" onclick="handleSidebarNavigation('subscription')" class="sidebar-menu-item">
+        <i class="fa-solid fa-crown menu-item-icon"></i>
+        <span class="menu-item-text" id="sidebar-text-premium">Premium</span>
+      </button>
+      <button id="sidebar-link-video" onclick="handleSidebarNavigation('video')" class="sidebar-menu-item">
+        <i class="fa-solid fa-play menu-item-icon"></i>
+        <span class="menu-item-text" id="sidebar-text-video">Video</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Secondary / Collapsible Items -->
+    <div class="sidebar-collapsible-group">
+      <div class="collapsible-item-row" onclick="handleSidebarAction('my-graphs')">
+        <div class="collapsible-left">
+          <i class="fa-solid fa-chart-pie group-icon"></i>
+          <span id="sidebar-text-mygraphs">My Graphs</span>
+        </div>
+        <i class="fa-solid fa-expand expand-sub-icon"></i>
+      </div>
+      
+      <div class="collapsible-item-row" onclick="handleSidebarAction('my-articles')">
+        <div class="collapsible-left">
+          <i class="fa-solid fa-newspaper group-icon"></i>
+          <span id="sidebar-text-myarticles">My Articles</span>
+        </div>
+        <i class="fa-solid fa-expand expand-sub-icon"></i>
+      </div>
+
+      <div class="collapsible-item-row" onclick="handleSidebarAction('my-purchases')">
+        <div class="collapsible-left">
+          <i class="fa-solid fa-cart-shopping group-icon"></i>
+          <span id="sidebar-text-mypurchases">My Purchases</span>
+        </div>
+        <i class="fa-solid fa-expand expand-sub-icon"></i>
+      </div>
+    </div>
+
+    <!-- Sponsored Card at bottom -->
+    <div class="sidebar-sponsored-card">
+      <div class="sponsored-card-content">
+        <div id="sidebar-sponsored-title" class="sponsored-title">Boost Productivity with AI</div>
+        <i class="fa-solid fa-brain sponsored-brain-icon"></i>
+      </div>
+      <div id="sidebar-sponsored-label" class="sponsored-tag">SPONSORED</div>
+    </div>
+
+  </div>
+</div>
+
 <!-- APPLE GLOBAL NAVBAR -->
 <header class="navbar-apple">
   <div class="nav-inner-apple">
-    <div class="apple-logo" onclick="showPage('home')" title="דף הבית">
-      <img src="logo.png" alt="לוגו" style="height: 32px; width: auto; display: block;" />
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button id="navbar-sidebar-toggle" onclick="toggleSidebarDrawer()" class="apple-icon-btn" style="background:none; border:none; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; margin-right: 4px; color:inherit;">
+        <i class="fa-solid fa-bars-staggered"></i>
+      </button>
+      <div class="apple-logo" onclick="showPage('home')" title="דף הבית">
+        <img src="logo.png" alt="לוגו" style="height: 32px; width: auto; display: block;" />
+      </div>
     </div>
     
     <nav class="apple-nav-links">
-      <button onclick="showPage('pdf-store')" class="apple-nav-item">תמונות גולשים</button>
-      <button onclick="showPage('home')" class="apple-nav-item">סיפורים</button>
+      <button id="nav-btn-pdf" onclick="showPage('pdf-store')" class="apple-nav-item">תמונות גולשים</button>
+      <button id="nav-btn-home" onclick="showPage('home')" class="apple-nav-item">הסיפורים</button>
+
+      <!-- Apple Search Box -->
+      <div class="apple-search-box">
+        <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="חפש כתבות ותמונות..." autocomplete="off">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <div id="global-search-results" class="search-results-dropdown hidden"></div>
+      </div>
+
+      <button id="lang-toggle" onclick="toggleLanguage()" class="apple-nav-item" style="background:rgba(0,113,227,0.08); color:var(--primary); border: 1px solid rgba(0,113,227,0.15); font-weight:600; padding:6px 12px; border-radius:980px; display:inline-flex; align-items:center; gap:6px; font-size:11.5px; transition:all 0.2s; cursor:pointer; margin-right:8px;">
+        <i class="fa-solid fa-globe"></i> <span>English</span>
+      </button>
 
       <button id="theme-toggle" onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-right:16px; padding:8px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.3s; width:40px; height:40px;">🌓</button>
       
       <!-- User Account Section -->
       <div id="user-nav-section" style="margin-right: 12px; display: flex; align-items: center;">
-        <button class="btn-orange" onclick="showPage('subscription')" style="cursor: pointer; position: relative; z-index: 1001;">💳 מנוי חודשי</button>
+        <button id="nav-btn-sub" class="btn-orange" onclick="showPage('subscription')" style="cursor: pointer; position: relative; z-index: 1001;">💳 מנוי חודשי</button>
         <button id="btn-join" class="btn-primary" onclick="showPage('join')" style="font-size: 0.75rem; padding: 6px 16px; height: 30px; min-height: 0;">✨ הצטרף</button>
         <button id="btn-inbox-nav" onclick="showInboxPage()" style="display: none; padding: 6px 16px; height: 32px; border-radius: 980px; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border-subtle); cursor: pointer; color: #1d1d1f; font-weight: 600; font-size: 0.85rem; margin-left: 8px;">
-          <i class="fa-regular fa-comment-dots"></i> <span>הודעות</span>
+          <i class="fa-regular fa-comment-dots"></i> <span id="btn-inbox-text">הודעות</span>
           <span id="inbox-unread-badge" style="display:none; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; justify-content: center; align-items: center;"></span>
         </button>
         <div id="user-profile-badge" onclick="handleProfileBadgeClick()" style="display: none; cursor: pointer; border: 1px solid var(--border-subtle); background: var(--bg-main); padding: 4px 10px; border-radius: 980px; align-items: center; gap: 8px;">
@@ -46,33 +150,113 @@
 <!-- HOME PAGE (NEWS LAYOUT) -->
 <div id="page-home" class="page active" style="padding-top: 0; max-width: 100%;">
   
-  <section class="top-news-grid" id="top-news-grid">
-    <!-- Populated by JS -->
+  <!-- PREMIUM NEWS CAROUSEL -->
+  <section class="top-news-carousel-container" id="top-news-carousel-container" style="position: relative; overflow: hidden; border-radius: 24px; margin-bottom: 40px; box-shadow: var(--shadow-soft);">
+    <div class="carousel-viewport" style="overflow: hidden; width: 100%; border-radius: 24px;">
+      <div class="top-news-track" id="top-news-track" style="display: flex; gap: 21px; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); width: 100%;">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    
+    <!-- Navigation Arrows -->
+    <button onclick="slideCarouselPrev()" class="carousel-arrow prev" style="position: absolute; top: 50%; left: 20px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid var(--border-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s; color:#1d1d1f;">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button onclick="slideCarouselNext()" class="carousel-arrow next" style="position: absolute; top: 50%; right: 20px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid var(--border-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s; color:#1d1d1f;">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
   </section>
 
   <div class="main-news-layout" style="margin-top: 40px; display: flex; gap: 40px;">
     
     <div class="news-feed" style="flex:1; min-width: 0;">
+      <!-- Category Filter Bar -->
+      <div id="category-filter-bar" class="category-filter-bar"></div>
+      
       <div id="news-feed-list">
         <!-- Populated by JS -->
       </div>
       <div id="news-pagination" style="display:flex; justify-content:center; gap:8px; margin-top: 32px; flex-wrap:wrap;"></div>
     </div>
-    
-    <aside class="news-sidebar">
-      <div class="sidebar-ad" style="background:#fff; border-radius:16px; border:1px solid var(--border-subtle); padding:24px; text-align:center; box-shadow:var(--shadow-soft); display:flex; flex-direction:column; min-height: 250px; position: sticky; top: 100px;">
-        <h3 style="font-size:1.4rem; font-weight:800; margin-bottom:12px;">שטח פרסום</h3>
-        <p style="color:var(--text-muted); font-size:1rem; margin-bottom:24px; line-height: 1.5;">הזדמנות נהדרת להגיע לאלפי קוראים ביום. פנה אלינו לקבלת הצעת מחיר משתלמת.</p>
-        <button class="btn-primary" style="margin-top:auto; width:100%; border-radius:980px;" onclick="openContactModal()">פרסם אצלנו למטה</button>
-      </div>
-    </aside>
   </div>
 </div>
 
 
 <!-- PDF STORE PAGE -->
 <div id="page-pdf-store" class="page" style="max-width: 1280px; padding-top: 40px;">
-    <h2 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px;">תמונות גולשים</h2>
+  
+  <!-- Premium Video/Photo Featured Banner -->
+  <div class="store-featured-banner" style="position:relative; background:#0f1013; height:380px; border-radius:24px; overflow:hidden; margin-bottom:48px; box-shadow:var(--shadow-soft); display:flex; flex-direction:column;">
+    
+    <!-- Video background (Looping & silent!) -->
+    <video autoplay loop muted playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.35; z-index:1; pointer-events:none;">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-loop-41859-large.mp4" type="video/mp4">
+    </video>
+    
+    <!-- Top Horizontal Ticker Marquee -->
+    <div class="store-ticker-wrap" style="position:relative; z-index:2; background:rgba(0,0,0,0.6); padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08); overflow:hidden;">
+      <div class="store-ticker-track" style="display:flex; gap:50px; white-space:nowrap; animation: storeTickerMove 25s linear infinite; font-size:0.85rem; font-weight:700; color:#fff; text-transform:uppercase;">
+        <span>🔥 SOLD! Vid to Bobloblaw88</span>
+        <span>⭐ SOLD! Vid to KhaiHola</span>
+        <span>💎 SOLD! Vid to el3mntzzz</span>
+        <span>🚀 SOLD! Vid to tadk53</span>
+        <span>🔥 SOLD! Vid to Bobloblaw88</span>
+        <span>⭐ SOLD! Vid to KhaiHola</span>
+        <span>💎 SOLD! Vid to el3mntzzz</span>
+        <span>🚀 SOLD! Vid to tadk53</span>
+      </div>
+    </div>
+    
+    <!-- Slider Content Panel -->
+    <div style="position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 60px;">
+      
+      <!-- Side cards overlay simulation (left/right depth) -->
+      <div class="side-card-sim left" style="display:flex; gap:16px; opacity:0.4; pointer-events:none;">
+        <div style="width:70px; height:180px; background:#2c2c2e; border-radius:16px; transform: rotate(-5deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
+        <div style="width:90px; height:200px; background:#1c1c1e; border-radius:16px; transform: rotate(-3deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
+      </div>
+      
+      <!-- Center featured content details -->
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center; max-width:550px; margin:0 auto;">
+        <span style="background:#db2777; color:#fff; font-size:0.75rem; font-weight:800; padding:6px 16px; border-radius:980px; text-transform:uppercase; letter-spacing:0.05em;">Top Video of the Day</span>
+        
+        <!-- User Profile Header -->
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150" style="width:48px; height:48px; border-radius:50%; border:2px solid #fff; object-fit:cover;" />
+          <div style="text-align:right;">
+            <div style="color:#fff; font-weight:800; font-size:1.1rem;">baby_carrie</div>
+            <div style="color:#86868b; font-size:0.85rem;">@baby_carrie</div>
+          </div>
+        </div>
+        
+        <h2 style="color:#fff; font-size:1.6rem; font-weight:900; line-height:1.3; margin:0;">4K Cute Pajama Haul + Hello Kitty Bikini Try-On</h2>
+        
+        <div style="display:flex; align-items:center; gap:16px;">
+          <span style="color:#a855f7; font-weight:900; font-size:1.2rem;">FREE</span>
+          <span style="color:#86868b; font-size:0.9rem; display:flex; align-items:center; gap:4px;"><i class="fa-regular fa-eye"></i> 7.7K views</span>
+        </div>
+      </div>
+      
+      <!-- Side cards overlay simulation (right depth) -->
+      <div class="side-card-sim right" style="display:flex; gap:16px; opacity:0.4; pointer-events:none;">
+        <div style="width:90px; height:200px; background:#1c1c1e; border-radius:16px; transform: rotate(3deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
+        <div style="width:70px; height:180px; background:#2c2c2e; border-radius:16px; transform: rotate(5deg); box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
+      </div>
+      
+      <!-- Navigation Arrows -->
+      <button class="banner-arrow prev" style="position:absolute; left:20px; top:55%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#fff; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all 0.2s;"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="banner-arrow next" style="position:absolute; right:20px; top:55%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#fff; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all 0.2s;"><i class="fa-solid fa-chevron-right"></i></button>
+      
+    </div>
+  </div>
+  
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding:0 4px;">
+    <h2 id="store-title-text" style="font-size: 2.2rem; font-weight: 900; letter-spacing: -0.04em; margin: 0;">תמונות גולשים פופולריות</h2>
+    <button class="btn-primary" onclick="openContactModal()" style="font-size:0.85rem; padding:8px 20px; border-radius:980px; display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-subtle); color:#1d1d1f; font-weight:700; cursor:pointer;">
+      <span>View More</span> <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+  
   <div id="pdf-store-grid" class="pdf-store-grid">
     <!-- Populated by JS -->
   </div>
@@ -750,37 +934,66 @@
   </div>
 </div>
 
-<!-- APPLE STYLE FOOTER -->
+<!-- PREMIUM STYLE FOOTER -->
 <footer class="apple-footer">
-  <div class="footer-content">
-      <div class="footer-col">
-        <h4>צרו קשר</h4>
-        <ul>
-          <li><a href="#" onclick="showToast('אופציית מנוי חודשי תהיה זמינה בקרוב!'); return false;">⭐ מנוי חודשי</a></li>
-          <li><a href="#" onclick="openContactModal(); return false;">אימייל למערכת</a></li>
-          <li><a href="tel:050-000-0000">התקשר אלינו: 050-000-0000</a></li>
-        </ul>
+  <div class="footer-content" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding: 60px 24px 40px;">
+    
+    <!-- Brand & Badges Column -->
+    <div class="footer-brand-col" style="display:flex; flex-direction:column; gap:20px;">
+      <div class="footer-brand-logo" style="display:flex; align-items:center; gap:8px; font-size:1.8rem; font-weight:900; color:#fff;">
+        <i class="fa-solid fa-crown" style="color: #f59e0b; filter: drop-shadow(0 0 8px rgba(245,158,11,0.4));"></i>
+        <span>SOKI</span>
       </div>
-      <div class="footer-col">
-        <h4>ניהול</h4>
-        <ul>
-          <li><a href="#" onclick="showPage('admin-login')">התחבר מנהל</a></li>
-        </ul>
+      
+      <!-- Social Media Buttons -->
+      <div class="social-icons" style="display: flex; gap: 16px; font-size: 1.1rem; color: rgba(255,255,255,0.6);">
+        <a href="#" id="footer-link-x" class="social-icon-btn" target="_blank" title="X (Twitter)" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" id="footer-link-linkedin" class="social-icon-btn" target="_blank" title="LinkedIn" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" id="footer-link-fb" class="social-icon-btn" target="_blank" title="Facebook" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" id="footer-link-ig" class="social-icon-btn" target="_blank" title="Instagram" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" id="footer-link-yt" class="social-icon-btn" target="_blank" title="YouTube" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#" id="footer-link-mastodon" class="social-icon-btn" target="_blank" title="Mastodon" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-mastodon"></i></a>
+        <a href="#" id="footer-link-threads" class="social-icon-btn" target="_blank" title="Threads" style="color:inherit; transition:color 0.2s;"><i class="fa-brands fa-threads"></i></a>
       </div>
-      <div class="footer-col social-col" style="max-width: 320px;">
-        <h4>צור קשר</h4>
-        <div class="social-icons" style="display: flex; gap: 12px; margin-top: 20px;">
-          <a href="#" id="footer-link-x" class="social-icon-btn" target="_blank" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
-          <a href="#" id="footer-link-fb" class="social-icon-btn" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" id="footer-link-ig" class="social-icon-btn" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#" id="footer-link-yt" class="social-icon-btn" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-          <a href="https://paypal.me/yhsh98321" class="social-icon-btn paypal-footer-icon" target="_blank" title="PayPal"><i class="fa-brands fa-paypal"></i></a>
-        </div>
+      
+      <!-- App Badges -->
+      <div class="app-store-badges" style="display:flex; gap:12px; margin-top: 10px;">
+        <a href="#" style="display:inline-block; height:40px;"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" style="height:100%; border-radius:6px;"></a>
+        <a href="#" style="display:inline-block; height:40px;"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" style="height:100%; border-radius:6px;"></a>
       </div>
+      
+      <p id="footer-copyright-text" style="font-size:0.8rem; color:#86868b; margin-top:20px;">© 2026 soki Media LLC. All rights reserved.</p>
     </div>
-    <div class="footer-bottom">
-      <p>כל הזכויות שמורות © 2026 חדשות. נבנה על מנת לספק את העדכונים החדשים ביותר.</p>
+
+    <!-- Column 1: Contact Us -->
+    <div class="footer-col">
+      <h4 id="footer-col-1-header" style="font-size:0.9rem; font-weight:700; color:#fff; text-transform:uppercase; margin-bottom:20px; letter-spacing:0.05em;">Contact Us</h4>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+        <li><a href="#" id="footer-col-1-link-1" onclick="showPage('subscription'); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; display:flex; align-items:center; gap:6px; transition:color 0.2s;">⭐ Monthly Subscription</a></li>
+        <li><a href="#" id="footer-col-1-link-2" onclick="openContactModal(); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">Email Support</a></li>
+        <li><a href="tel:+1-555-0199" id="footer-col-1-link-3" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">Call Us: +1-555-0199</a></li>
+        <li><a href="https://paypal.me/yhsh98321" id="footer-col-1-link-4" target="_blank" style="color:#22c55e; text-decoration:none; font-size:0.9rem; display:flex; align-items:center; gap:6px; font-weight:600; transition:color 0.2s;"><i class="fa-brands fa-paypal"></i> Donate via PayPal</a></li>
+      </ul>
     </div>
+
+    <!-- Column 2: Information -->
+    <div class="footer-col">
+      <h4 id="footer-col-2-header" style="font-size:0.9rem; font-weight:700; color:#fff; text-transform:uppercase; margin-bottom:20px; letter-spacing:0.05em;">Information</h4>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+        <li><a href="#" id="footer-col-2-link-1" onclick="showToast('אודותינו יהיה זמין בקרוב!'); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">About Us</a></li>
+        <li><a href="#" id="footer-col-2-link-2" onclick="showPage('home'); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">What's New</a></li>
+      </ul>
+    </div>
+
+    <!-- Column 3: Admin -->
+    <div class="footer-col">
+      <h4 id="footer-col-3-header" style="font-size:0.9rem; font-weight:700; color:#fff; text-transform:uppercase; margin-bottom:20px; letter-spacing:0.05em;">Admin</h4>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+        <li><a href="#" id="footer-col-3-link-1" onclick="showPage('admin-login'); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">Admin Login</a></li>
+        <li><a href="#" id="footer-col-3-link-2" onclick="showPage('admin'); return false;" style="color:#86868b; text-decoration:none; font-size:0.9rem; transition:color 0.2s;">Upload Articles</a></li>
+      </ul>
+    </div>
+
   </div>
 </footer>
 
@@ -988,6 +1201,120 @@
       </p>
     </div>
   </div>
+</div>
+
+<!-- GRAPHS & DATA PAGE -->
+<div id="page-graphs" class="page" style="max-width: 1200px; padding-top: 60px; display: none;">
+  <div class="section-header" style="margin-bottom: 30px;">
+    <h2 id="graphs-page-title" style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em;">Graphs & Data</h2>
+    <span class="section-tag" id="graphs-page-tag" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">Real-time System Analytics</span>
+  </div>
+  
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top:32px;">
+    <!-- Card 1: Traffic Chart -->
+    <div style="background:#fff; border-radius:24px; padding:32px; border:1px solid var(--border-subtle); box-shadow:var(--shadow-soft);">
+      <h3 id="graph-card-1-title" style="font-size:1.2rem; font-weight:800; margin-bottom:24px; display:flex; align-items:center; gap:10px; color:#1d1d1f;"><i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> תעבורת אתר יומית</h3>
+      <div style="height:200px; display:flex; align-items:flex-end; gap:16px; border-bottom:2px solid var(--border-subtle); padding-bottom:12px; position:relative;">
+        <div style="flex:1; height:40%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="1,200"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">א'</span></div>
+        <div style="flex:1; height:60%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="1,800"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ב'</span></div>
+        <div style="flex:1; height:85%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="2,400"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ג'</span></div>
+        <div style="flex:1; height:50%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="1,500"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ד'</span></div>
+        <div style="flex:1; height:95%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="3,100"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ה'</span></div>
+        <div style="flex:1; height:30%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="900"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ו'</span></div>
+        <div style="flex:1; height:20%; background:linear-gradient(to top, var(--primary), #a78bfa); border-radius:8px 8px 0 0; position:relative;" class="chart-bar" data-val="600"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">ש'</span></div>
+      </div>
+      <p id="graph-card-1-desc" style="color:var(--text-muted); font-size:0.85rem; margin-top:16px;">* תנועת גולשים ייחודית בחתך ימים בשבוע האחרון.</p>
+    </div>
+
+    <!-- Card 2: Interactive Revenue Chart -->
+    <div style="background:#fff; border-radius:24px; padding:32px; border:1px solid var(--border-subtle); box-shadow:var(--shadow-soft);">
+      <h3 id="graph-card-2-title" style="font-size:1.2rem; font-weight:800; margin-bottom:24px; display:flex; align-items:center; gap:10px; color:#1d1d1f;"><i class="fa-solid fa-coins" style="color:#eab308;"></i> הכנסות ממנויים</h3>
+      <div style="height:200px; display:flex; align-items:flex-end; gap:16px; border-bottom:2px solid var(--border-subtle); padding-bottom:12px; position:relative;">
+        <div style="flex:1; height:30%; background:linear-gradient(to top, #eab308, #f59e0b); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">מרץ</span></div>
+        <div style="flex:1; height:50%; background:linear-gradient(to top, #eab308, #f59e0b); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">אפר'</span></div>
+        <div style="flex:1; height:80%; background:linear-gradient(to top, #eab308, #f59e0b); border-radius:8px 8px 0 0; position:relative;"><span style="position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:0.8rem; font-weight:700;">מאי</span></div>
+      </div>
+      <p id="graph-card-2-desc" style="color:var(--text-muted); font-size:0.85rem; margin-top:16px;">* גידול חודשי יציב בהכנסות מתוכניות פרימיום.</p>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO PAGE -->
+<div id="page-video" class="page" style="max-width: 1000px; padding-top: 60px; display: none;">
+  <div class="section-header" style="margin-bottom: 30px;">
+    <h2 id="video-page-title" style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em;">סרטונים ושידורים חיים</h2>
+    <span class="section-tag" id="video-page-tag" style="color: var(--primary); font-weight: 600; font-size: 0.95rem;">Premium Member Content</span>
+  </div>
+  
+  <div style="margin-top:32px; background:#000; border-radius:24px; overflow:hidden; aspect-ratio: 16/9; position:relative; box-shadow:0 20px 50px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
+    <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&q=80&w=1200" style="width:100%; height:100%; object-fit:cover; opacity:0.7;" alt="Video placeholder">
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.4);">
+      <button onclick="showToast('הפעלת וידאו תהיה זמינה בקרוב למנויי Premium!')" style="background:var(--primary); color:#fff; border:none; width:80px; height:80px; border-radius:50%; font-size:2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(0,113,227,0.5); transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+        <i class="fa-solid fa-play" style="margin-left:4px;"></i>
+      </button>
+      <h3 id="video-mock-title" style="color:#fff; font-size:1.5rem; font-weight:800; margin-top:24px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">סקירת דגמי ה-ThinkPad החדשים של לנובו לשנת 2026</h3>
+      <p id="video-mock-subtitle" style="color:rgba(255,255,255,0.8); font-size:1rem; margin-top:8px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">סרטון פרימיום בלעדי למנויים</p>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOMER SERVICE CHAT WIDGET -->
+<div id="customer-service-widget" style="position: fixed; bottom: 30px; right: 30px; z-index: 10005; display: flex; align-items: center; gap: 10px;">
+  
+  <!-- Floating Main Button Capsule -->
+  <button id="customer-service-btn" onclick="toggleChatPanel()" style="background: #0071e3; color: #fff; border: none; padding: 14px 24px; border-radius: 980px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,113,227,0.3); transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1);">
+    <i class="fa-solid fa-headset" style="font-size: 1.2rem;"></i>
+    <span id="cs-btn-text">Customer Service</span>
+  </button>
+  
+  <!-- Mini Close Button next to it -->
+  <button id="customer-service-close-x" onclick="hideCsWidget()" style="background: rgba(0,0,0,0.8); color: #fff; border: 1px solid rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s;">
+    ✕
+  </button>
+
+</div>
+
+<!-- CHAT WINDOW PANEL -->
+<div id="customer-service-panel" class="cs-panel-hidden" style="position: fixed; bottom: 95px; right: 30px; width: 380px; max-width: 90vw; height: 500px; max-height: 80vh; background: #fff; border-radius: 24px; border: 1px solid var(--border-subtle); box-shadow: 0 20px 50px rgba(0,0,0,0.15); z-index: 10006; display: flex; flex-direction: column; overflow: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+  
+  <!-- Chat Header -->
+  <div style="background: linear-gradient(135deg, #0071e3 0%, #1d1d1f 100%); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="position: relative;">
+        <i class="fa-solid fa-circle-user" style="font-size: 2.2rem; color: rgba(255,255,255,0.8);"></i>
+        <div style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; position: absolute; bottom: 2px; right: -2px; border: 2px solid #0071e3;"></div>
+      </div>
+      <div>
+        <h4 id="cs-panel-title" style="font-size: 1.05rem; font-weight: 800; margin: 0;">שירות לקוחות SOKI</h4>
+        <span id="cs-panel-status" style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 4px;">פעיל עכשיו</span>
+      </div>
+    </div>
+    <button onclick="toggleChatPanel()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 4px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">✕</button>
+  </div>
+
+  <!-- Chat Messages Container -->
+  <div id="cs-chat-body" style="flex: 1; padding: 24px; overflow-y: auto; background: #fbfbfd; display: flex; flex-direction: column; gap: 16px;">
+    <!-- Welcome message -->
+    <div style="align-self: flex-start; max-width: 80%; background: #fff; border: 1px solid var(--border-subtle); padding: 14px 18px; border-radius: 16px 16px 16px 4px; font-size: 0.95rem; line-height: 1.5; color: #1d1d1f; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+      <span id="cs-welcome-msg">שלום! כיצד נוכל לעזור לך היום? בחר באחת מהאפשרויות הבאות או כתוב לנו הודעה.</span>
+    </div>
+    
+    <!-- Quick buttons -->
+    <div id="cs-quick-replies" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+      <button id="cs-quick-1" onclick="sendCsQuickReply(1)" class="cs-quick-btn" style="text-align: right; background: #fff; border: 1px solid #0071e3; color: #0071e3; padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;">💳 איך מצטרפים למנוי Premium?</button>
+      <button id="cs-quick-2" onclick="sendCsQuickReply(2)" class="cs-quick-btn" style="text-align: right; background: #fff; border: 1px solid #0071e3; color: #0071e3; padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;">📸 איך מעלים תמונות גולשים?</button>
+      <button id="cs-quick-3" onclick="sendCsQuickReply(3)" class="cs-quick-btn" style="text-align: right; background: #fff; border: 1px solid #0071e3; color: #0071e3; padding: 12px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;">👤 שיחה עם נציג תמיכה אנושי</button>
+    </div>
+  </div>
+
+  <!-- Chat Input Footer -->
+  <div style="padding: 16px; border-top: 1px solid var(--border-subtle); background: #fff; display: flex; gap: 8px; align-items: center;">
+    <input type="text" id="cs-chat-input" placeholder="הקלד הודעה כאן..." onkeydown="if(event.key==='Enter') sendCsCustomMessage()" style="flex: 1; border: 1px solid #d2d2d7; padding: 12px 16px; border-radius: 980px; font-size: 0.95rem; outline: none; background: #fbfbfd; transition: all 0.2s; font-family: inherit;">
+    <button onclick="sendCsCustomMessage()" style="background: #0071e3; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,113,227,0.2);">
+      <i class="fa-solid fa-paper-plane" id="cs-send-icon"></i>
+    </button>
+  </div>
+
 </div>
 
 <div id="toast" class="toast"></div>

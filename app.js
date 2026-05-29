@@ -31,6 +31,12 @@ let newsArticles = storedArticles ? JSON.parse(storedArticles) : [...defaultNews
 if (!storedArticles) {
   localStorage.setItem('newsArticles', JSON.stringify(newsArticles));
 }
+// Force first slide to show high-end looping video
+const art1 = newsArticles.find(a => a.id === 1);
+if (art1) {
+  art1.image = 'https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-loop-41859-large.mp4';
+  localStorage.setItem('newsArticles', JSON.stringify(newsArticles));
+}
 
 let nextId = newsArticles.length ? Math.max(...newsArticles.map(a => a.id)) + 1 : 1;
 let isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -39,6 +45,67 @@ if (localStorage.getItem('viewerPhotos')) localStorage.removeItem('viewerPhotos'
 if (localStorage.getItem('comicsStore')) localStorage.removeItem('comicsStore');
 
 let previousPage = 'home';
+
+// ========== CATEGORY FILTER BAR SYSTEM ==========
+let selectedCategory = 'all';
+
+const categoryNameMap = {
+  he: {
+    'all': 'הכל',
+    'מחשבים': '💻 מחשבים',
+    'אבטחה': '🛡️ אבטחה',
+    'שעונים חכמים': '⌚ שעונים חכמים',
+    'גוגל': '🤖 גוגל',
+    'חומרה': '🔌 חומרה',
+    'אפליקציות': '📱 אפליקציות'
+  },
+  en: {
+    'all': 'All',
+    'מחשבים': '💻 Computers',
+    'אבטחה': '🛡️ Security',
+    'שעונים חכמים': '⌚ Smart Watches',
+    'גוגל': '🤖 Google',
+    'חומרה': '🔌 Hardware',
+    'אפליקציות': '📱 Apps'
+  }
+};
+
+function renderCategoryBar() {
+  const bar = document.getElementById('category-filter-bar');
+  if (!bar) return;
+  
+  // Extract all categories from newsArticles (except top articles)
+  const dbCategories = [...new Set(newsArticles.map(a => a.category).filter(Boolean))];
+  const allCategories = ['all', ...dbCategories];
+  
+  const map = categoryNameMap[currentLang] || categoryNameMap['he'];
+  
+  bar.innerHTML = allCategories.map(cat => {
+    let label = map[cat] || cat;
+    if (!map[cat]) {
+      if (cat === 'all') {
+        label = currentLang === 'en' ? 'All' : 'הכל';
+      } else {
+        label = `📰 ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+      }
+    }
+    
+    const activeClass = (cat === selectedCategory) ? 'active' : '';
+    return `
+      <button class="category-chip ${activeClass}" onclick="selectCategory('${cat}')">
+        ${escHtml(label)}
+      </button>
+    `;
+  }).join('');
+}
+
+function selectCategory(cat) {
+  selectedCategory = cat;
+  renderCategoryBar();
+  renderNewsLayout(1);
+}
+
+// ================================================
 
 // ========== SOCIAL LINKS LOGIC ==========
 const defaultSocialLinks = {
@@ -156,41 +223,145 @@ function goBack() {
 let currentPage = 1;
 const ARTICLES_PER_PAGE = 10;
 
+let currentSlideIndex = 0;
+let carouselInterval = null;
+
+function startCarouselAutoCycle() {
+  if (carouselInterval) clearInterval(carouselInterval);
+  carouselInterval = setInterval(() => {
+    slideCarouselNext();
+  }, 10000); // 10 seconds auto-rotation
+}
+
+function slideCarouselNext() {
+  const topArticles = newsArticles.filter(x => x.isTop);
+  if (topArticles.length <= 3) return;
+  const maxIndex = topArticles.length - 3;
+  currentSlideIndex = (currentSlideIndex + 1) > maxIndex ? 0 : (currentSlideIndex + 1);
+  updateCarouselPosition();
+  startCarouselAutoCycle();
+}
+
+function slideCarouselPrev() {
+  const topArticles = newsArticles.filter(x => x.isTop);
+  if (topArticles.length <= 3) return;
+  const maxIndex = topArticles.length - 3;
+  currentSlideIndex = (currentSlideIndex - 1) < 0 ? maxIndex : (currentSlideIndex - 1);
+  updateCarouselPosition();
+  startCarouselAutoCycle();
+}
+
+function updateCarouselPosition() {
+  const track = document.getElementById('top-news-track');
+  if (!track) return;
+  
+  const dir = document.documentElement.dir || 'rtl';
+  const step = `calc(${currentSlideIndex} * (33.333% + 7px))`;
+  
+  if (dir === 'rtl') {
+    track.style.transform = `translateX(${step})`;
+  } else {
+    track.style.transform = `translateX(-${step})`;
+  }
+}
+
 function renderNewsLayout(page = 1) {
   currentPage = page;
-  const topGrid = document.getElementById('top-news-grid');
+  renderCategoryBar();
+  const track = document.getElementById('top-news-track');
   const feedList = document.getElementById('news-feed-list');
   const paginationEl = document.getElementById('news-pagination');
-  if(!topGrid || !feedList) return;
+  if(!track || !feedList) return;
 
-  // Top 3 hero cards only on first page
   const topArticles = newsArticles.filter(x => x.isTop).sort((a,b) => a.isTop - b.isTop);
-  if (page === 1) {
-    topGrid.innerHTML = topArticles.map(a => `
-      <div class="top-news-card" onclick="showArticle(${a.id})">
-        <div class="top-news-bg" style="background-image: url('${a.image}')"></div>
-        <div class="top-news-overlay">
-          <h3>${escHtml(a.title)}</h3>
-        </div>
-      </div>
-    `).join('');
+  
+  const container = document.getElementById('top-news-carousel-container');
+  if (container) {
+    if (page === 1) {
+      container.style.display = 'block';
+      
+      // Control arrows visibility dynamically
+      const prevArrow = container.querySelector('.carousel-arrow.prev');
+      const nextArrow = container.querySelector('.carousel-arrow.next');
+      if (prevArrow && nextArrow) {
+        if (topArticles.length <= 3) {
+          prevArrow.style.display = 'none';
+          nextArrow.style.display = 'none';
+        } else {
+          prevArrow.style.display = 'flex';
+          nextArrow.style.display = 'flex';
+        }
+      }
+
+      track.innerHTML = topArticles.map(a => {
+        const trans = (currentLang === 'en' && articleTranslations[a.id]) ? articleTranslations[a.id] : {};
+        const title = trans.title || a.title;
+        const category = trans.category || a.category;
+        
+        const isVideo = a.image && (a.image.endsWith('.mp4') || a.image.includes('mixkit') || a.image.includes('video'));
+        const bgContent = isVideo 
+          ? `<video autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+               <source src="${a.image}" type="video/mp4">
+             </video>`
+          : `<div class="slide-bg" style="background-image: url('${a.image}'); width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.8s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'"></div>`;
+          
+        return `
+          <div class="carousel-slide" onclick="showArticle(${a.id})" style="flex: 0 0 calc(33.333% - 14px); max-width: calc(33.333% - 14px); position: relative; aspect-ratio: 16/10; min-height: 280px; cursor: pointer; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            ${bgContent}
+            <div class="slide-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.15) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; text-align: inherit; box-sizing: border-box;">
+              <div style="align-self: flex-start; background: #0071e3; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; z-index: 2;">
+                ${escHtml(category)}
+              </div>
+              <h3 style="color: #fff; font-size: 1.25rem; font-weight: 800; line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 5.8em; text-overflow: ellipsis; text-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2;">
+                ${escHtml(title)}
+              </h3>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      updateCarouselPosition();
+      
+      if (topArticles.length > 3) {
+        startCarouselAutoCycle();
+      } else {
+        if (carouselInterval) clearInterval(carouselInterval);
+      }
+    } else {
+      container.style.display = 'none';
+      if (carouselInterval) clearInterval(carouselInterval);
+    }
   }
 
-  const feedArticles = newsArticles.filter(x => !x.isTop);
+  const feedArticles = newsArticles.filter(x => {
+    if (x.isTop) return false;
+    if (selectedCategory && selectedCategory !== 'all') {
+      return x.category === selectedCategory;
+    }
+    return true;
+  });
   const totalPages = Math.max(1, Math.ceil(feedArticles.length / ARTICLES_PER_PAGE));
   const start = (page - 1) * ARTICLES_PER_PAGE;
   const pageArticles = feedArticles.slice(start, start + ARTICLES_PER_PAGE);
 
-  feedList.innerHTML = pageArticles.map(a => `
-    <div class="feed-item" onclick="showArticle(${a.id})">
-      <div class="feed-image" style="background-image: url('${a.image}')"></div>
-      <div class="feed-content">
-        <h2 class="feed-title">${escHtml(a.title)}</h2>
-        <div class="feed-meta"><span class="author-name">${escHtml(a.author)}</span> <span class="meta-sep">|</span> <span class="meta-date">${escHtml(a.time)}</span></div>
-        ${a.snippet ? `<p class="feed-snippet">${escHtml(a.snippet)}</p>` : ''}
+  feedList.innerHTML = pageArticles.map(a => {
+    const trans = (currentLang === 'en' && articleTranslations[a.id]) ? articleTranslations[a.id] : {};
+    const title = trans.title || a.title;
+    const author = trans.author || a.author;
+    const time = trans.time || a.time;
+    const snippet = trans.snippet || a.snippet;
+    
+    return `
+      <div class="feed-item" onclick="showArticle(${a.id})">
+        <div class="feed-image" style="background-image: url('${a.image}')"></div>
+        <div class="feed-content">
+          <h2 class="feed-title">${escHtml(title)}</h2>
+          <div class="feed-meta"><span class="author-name">${escHtml(author)}</span> <span class="meta-sep">|</span> <span class="meta-date">${escHtml(time)}</span></div>
+          ${snippet ? `<p class="feed-snippet">${escHtml(snippet)}</p>` : ''}
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   // Render pagination buttons
   if (paginationEl) {
@@ -220,14 +391,21 @@ function showArticle(id) {
   const a = newsArticles.find(x => x.id === id);
   if (!a) return;
 
+  const trans = (currentLang === 'en' && articleTranslations[a.id]) ? articleTranslations[a.id] : {};
+  const title = trans.title || a.title;
+  const category = trans.category || a.category;
+  const author = trans.author || a.author;
+  const time = trans.time || a.time;
+  const content = trans.content || a.content;
+
   document.getElementById('article-content').innerHTML = `
     <header class="article-header">
-      <div class="article-category">${escHtml(a.category)}</div>
-      <h1 class="article-title-main" id="inline-title">${escHtml(a.title)}</h1>
+      <div class="article-category">${escHtml(category)}</div>
+      <h1 class="article-title-main" id="inline-title">${escHtml(title)}</h1>
       <div class="article-meta-main">
-        מאת <span id="inline-author" class="author-name" style="font-weight:700;">${escHtml(a.author)}</span>
+        ${currentLang === 'en' ? 'By' : 'מאת'} <span id="inline-author" class="author-name" style="font-weight:700;">${escHtml(author)}</span>
         <span class="meta-sep">|</span> 
-        <span id="inline-time" class="meta-date">${escHtml(a.time)}</span>
+        <span id="inline-time" class="meta-date">${escHtml(time)}</span>
       </div>
     </header>
     <div class="article-hero-img" id="inline-hero-img" style="background-image: url('${a.image}'); position: relative;">
@@ -235,17 +413,17 @@ function showArticle(id) {
       <div class="article-body" style="position:relative;">
         ${(a.isPremium && !isAdmin) ? `
         <div id="inline-content" style="filter: blur(6px); user-select: none; pointer-events: none; opacity: 0.5;">
-          ${a.content ? a.content.substring(0, 300) + '... (המשך הכתבה חסומה)' : `<p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה...</p>`}
+          ${content ? content.substring(0, 300) + '... (המשך הכתבה חסומה)' : `<p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה...</p>`}
         </div>
         <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255,255,255,0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 85%; max-width: 400px; border: 1px solid var(--border-subtle); backdrop-filter: blur(10px);">
           <div style="font-size: 3.5rem; margin-bottom: 16px;">💎</div>
-          <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: #1d1d1f;">תוכן פרימיום</h3>
-          <p style="color: #86868b; margin-bottom: 24px; font-size: 1.05rem;">סיפור זה זמין למנויים בלבד. הצטרף עכשיו כדי לקבל גישה מלאה לכל הכתבות שלנו.</p>
-          <button class="btn-primary" onclick="showPage('subscription')" style="width: 100%; font-size: 1.1rem; padding: 14px;">לרכישת מנוי שבועי/חודשי</button>
+          <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: #1d1d1f;">${currentLang === 'en' ? 'Premium Content' : 'תוכן פרימיום'}</h3>
+          <p style="color: #86868b; margin-bottom: 24px; font-size: 1.05rem;">${currentLang === 'en' ? 'This story is available to subscribers only. Join now for full access.' : 'סיפור זה זמין למנויים בלבד. הצטרף עכשיו כדי לקבל גישה מלאה לכל הכתבות שלנו.'}</p>
+          <button class="btn-primary" onclick="showPage('subscription')" style="width: 100%; font-size: 1.1rem; padding: 14px;">${currentLang === 'en' ? 'Get Premium Access' : 'לרכישת מנוי שבועי/חודשי'}</button>
         </div>
         ` : `
         <div id="inline-content">
-          ${a.content ? a.content : `
+          ${content ? content : `
           <p>זהו טקסט דמה להמחשת הכתבה. במערכת החדשות המלאה, אזור זה יישאב ממסד הנתונים ויכיל פסקאות, ציטוטים מורחבים, גלריות תמונות ואפשרויות לשיתוף ברשתות חברתיות.</p>
           <p>חברת הטכנולוגיה המובילה חשפה לאחרונה את כל העדכונים של המערכת המיוחלת החדשה. באירוע שערכה, השתתפו אלפי עיתונאי טכנולוגיה מכל העולם, שזכו לראות את כלי התוכנה המתקדמים ואת החומרה.</p>
           <p>בנוסף, הושם דגש מיוחד על יכולות בינה מלאכותית, פרטיות ואבטחת מידע, עם שיפורים שיהפכו כל פעולה ליעילה, נוחה ומאובטחת יותר מתמיד.</p>
@@ -656,26 +834,74 @@ function renderPdfStoreGrid() {
     grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:80px; color:#86868b; font-size:1.1rem;">אין פריטים בחנות עדיין. המנהל יוסיף בקרוב!</div>';
     return;
   }
+  
+  const userColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  const viewsArray = ['97K', '74K', '13K', '8.5K', '25K', '4.2K', '110K', '6.8K'];
+  const durationArray = ['03:51', '05:59', '08:14', '04:22', '06:45', '10:05'];
+  
   grid.innerHTML = items.map((item, i) => {
-    const icon = typeEmoji[item.type] || '📄';
-    const mainImg = (item.images && item.images.length > 0) ? item.images[0] : '';
+    // Generate beautiful initials avatar with high-end matching palette
+    const contactName = item.contact || 'User';
+    const userIndex = Math.abs(contactName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % userColors.length;
+    const avatarBg = userColors[userIndex];
+    const initials = contactName.charAt(0).toUpperCase();
+    
+    // Set fallback abstract premium image if missing
+    const cidMap = { 'PDF': '1544716278-ca5e3f4abd8c', 'תוכנה': '1517694712202-14dd9538aa97', 'סרטון': '1492724441997-5dc865305da7', 'קובץ': '1544391490-01c6db9f5a70', 'מדריך': '1497633762265-9d179a990aa6' };
+    const cid = cidMap[item.type] || cidMap['PDF'];
+    const fallback = `https://images.unsplash.com/photo-${cid}?auto=format&fit=crop&q=80&w=800`;
+    const mainImg = (item.images && item.images.length > 0) ? item.images[0] : fallback;
+    
+    const views = viewsArray[i % viewsArray.length];
+    const duration = durationArray[i % durationArray.length];
+    
+    // Format dynamic price pill
+    const isFree = !item.price || item.price === 'חינם' || parseFloat(item.price) === 0;
+    const priceClass = isFree ? 'price-free' : 'price-paid';
+    const priceLabel = isFree 
+      ? `${currentLang === 'en' ? 'FREE' : 'חינם'} <i class="fa-solid fa-play" style="font-size:0.7rem; margin-left:4px;"></i>` 
+      : `₪${item.price} <i class="fa-solid fa-cart-shopping" style="font-size:0.7rem; margin-left:4px;"></i>`;
     
     return `
-      <div class="pdf-card" onclick="showProductDetail(${i})">
-        ${mainImg ? `<img src="${mainImg}" style="width:100%; height:160px; object-fit:cover; border-radius:12px; margin-bottom:12px;" />` : 
-                    `<div class="pdf-card-icon">${icon}</div>`}
-        <div class="pdf-card-type">${escHtml(item.type)}</div>
-        <div class="pdf-card-title">${escHtml(item.title)}</div>
-        ${item.desc ? `<div class="pdf-card-desc">${escHtml(item.desc)}</div>` : ''}
+      <div class="pdf-card" onclick="showProductDetail(${i})" style="display:flex; flex-direction:column; align-items:stretch; gap:0; overflow:hidden; border-radius:20px; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
         
-        <div class="pdf-card-price" style="font-size: 0.85rem; color: #86868b; text-align: center; width: 100%;">
-          ${item.type === 'תוכן גולשים' ? 
-            `<div style="display:flex; flex-direction:column; gap:4px;">
-               <span style="color:var(--primary); font-weight:700;">${escHtml(item.date)}</span>
-               <span style="font-size:0.8rem;">${escHtml(item.contact || '')}</span>
-             </div>` : 
-            escHtml(item.price || 'חינם')}
+        <!-- User Profile Header -->
+        <div class="pdf-card-header" style="display:flex; align-items:center; gap:10px; padding:12px; border-bottom:1px solid var(--border-subtle); background:transparent; text-align:right;">
+          <div style="width:28px; height:28px; border-radius:50%; background:${avatarBg}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+            ${initials}
+          </div>
+          <div style="display:flex; flex-direction:column; text-align:right;">
+            <span style="font-weight:800; font-size:0.82rem; color:var(--text-main); line-height:1.2;">${escHtml(contactName)}</span>
+          </div>
         </div>
+        
+        <!-- Thumbnail Media Image Wrapper -->
+        <div class="pdf-card-media-wrapper" style="position:relative; width:100%; height:180px; overflow:hidden; background:#000;">
+          <img src="${mainImg}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" />
+          <span style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.75); color:#fff; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px; letter-spacing:0.02em; backdrop-filter:blur(4px);">
+            ${duration}
+          </span>
+        </div>
+        
+        <!-- Text/Metadata Body -->
+        <div class="pdf-card-body" style="padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:6px; flex:1; text-align:right;">
+          <h3 style="font-size:0.95rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.35; height:2.7em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; text-overflow:ellipsis;">
+            ${escHtml(item.title)}
+          </h3>
+        </div>
+        
+        <!-- Interactive Footer Stats/Pill Row -->
+        <div class="pdf-card-footer" style="display:flex; justify-content:space-between; align-items:center; padding:0 14px 14px 14px; background:transparent;">
+          <div style="display:flex; align-items:center; gap:4px; color:#86868b; font-size:0.8rem; font-weight:500;">
+            <i class="fa-regular fa-eye" style="font-size:0.85rem;"></i>
+            <span>${views}</span>
+          </div>
+          
+          <button class="pdf-card-action-btn ${priceClass}" style="border:none; outline:none; border-radius:980px; padding:6px 14px; font-size:0.75rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all 0.2s;">
+            ${priceLabel}
+          </button>
+        </div>
+        
       </div>
     `;
   }).join('');
@@ -994,11 +1220,12 @@ function submitContactForm(e) {
   }
 }
 
-// ========== THEME LOGIC ==========
 function initTheme() {
-  const savedTheme = localStorage.getItem('theme');
+  const savedTheme = localStorage.getItem('theme') || 'dark';
   if (savedTheme === 'dark') {
     document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
   }
 }
 
@@ -1715,3 +1942,605 @@ function handleSendPrivateMessage(e) {
 
 // Initial loads
 loadSocialLinks();
+
+// ========== BILINGUAL LOCALIZATION & SYSTEM INITIALIZATION ==========
+
+let currentLang = localStorage.getItem('siteLang') || 'he';
+
+const translationDictionary = {
+  he: {
+    // Navigation
+    'nav-btn-pdf': 'תמונות גולשים',
+    'nav-btn-home': 'סיפורים',
+    'nav-btn-sub': '💳 מנוי חודשי',
+    'btn-join': '✨ הצטרף',
+    'btn-inbox-text': 'הודעות',
+    'btn-logout-nav': 'התנתק',
+    // Sidebar ad
+    'sidebar-ad-title': 'שטח פרסום',
+    'sidebar-ad-text': 'הזדמנות נהדרת להגיע לאלפי קוראים ביום. פנה אלינו לקבלת הצעת מחיר משתלמת.',
+    'btn-sidebar-ad': 'פרסם אצלנו למטה',
+    // Sidebar drawer
+    'sidebar-dashboard-title': 'לוח הבקרה שלי',
+    'sidebar-text-stories': 'כתבות',
+    'sidebar-text-store': 'חנות',
+    'sidebar-text-graphs': 'גרפים ונתונים',
+    'sidebar-text-premium': 'פרימיום',
+    'sidebar-text-video': 'סרטונים',
+    'sidebar-text-mygraphs': 'הגרפים שלי',
+    'sidebar-text-myarticles': 'הכתבות שלי',
+    'sidebar-text-mypurchases': 'הרכישות שלי',
+    'sidebar-sponsored-title': 'שפר את הפרודוקטיביות עם AI',
+    'sidebar-sponsored-label': 'ממומן',
+    // Weather Widget
+    'weather-city': 'תל אביב',
+    'weather-temp': '24°C',
+    // Graphs & Data Page
+    'graphs-page-title': 'גרפים ונתונים',
+    'graphs-page-tag': 'ניתוח מערכת בזמן אמת',
+    'graph-card-1-title': '<i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> תעבורת אתר יומית',
+    'graph-card-1-desc': '* תנועת גולשים ייחודית בחתך ימים בשבוע האחרון.',
+    'graph-card-2-title': '<i class="fa-solid fa-coins" style="color:#eab308;"></i> הכנסות ממנויים',
+    'graph-card-2-desc': '* גידול חודשי יציב בהכנסות מתוכניות פרימיום.',
+    // Video Page
+    'video-page-title': 'סרטונים ושידורים חיים',
+    'video-page-tag': 'תוכן מנויים פרימיום',
+    'video-mock-title': 'סקירת דגמי ה-ThinkPad החדשים של לנובו לשנת 2026',
+    'video-mock-subtitle': 'סרטון פרימיום בלעדי למנויים',
+    // Customer Service Widget
+    'cs-btn-text': 'שירות לקוחות',
+    'cs-panel-title': 'שירות לקוחות SOKI',
+    'cs-panel-status': 'פעיל עכשיו',
+    'cs-welcome-msg': 'שלום! כיצד נוכל לעזור לך היום? בחר באחת מהאפשרויות הבאות או כתוב לנו הודעה.',
+    'cs-quick-1': '💳 איך מצטרפים למנוי Premium?',
+    'cs-quick-2': '📸 איך מעלים תמונות גולשים?',
+    'cs-quick-3': '👤 שיחה עם נציג תמיכה אנושי',
+    'cs-chat-input': 'הקלד הודעה כאן...',
+    // Footer Headers & Links
+    'footer-col-1-header': 'צור קשר',
+    'footer-col-1-link-1': '⭐ מנוי חודשי',
+    'footer-col-1-link-2': 'אימייל למערכת',
+    'footer-col-1-link-3': 'התקשר אלינו: 050-000-0000',
+    'footer-col-1-link-4': '<i class="fa-brands fa-paypal"></i> תרומה ב-PayPal',
+    'footer-col-2-header': 'מידע',
+    'footer-col-2-link-1': 'אודותינו',
+    'footer-col-2-link-2': 'מה חדש',
+    'footer-col-3-header': 'ניהול',
+    'footer-col-3-link-1': 'התחברות מנהל',
+    'footer-col-3-link-2': 'העלה כתבה',
+    'footer-copyright-text': 'כל הזכויות שמורות © 2026 SOKI Media LLC.',
+  },
+  en: {
+    // Navigation
+    'nav-btn-pdf': 'User Photos',
+    'nav-btn-home': 'Stories',
+    'nav-btn-sub': '💳 Monthly Sub',
+    'btn-join': '✨ Join Us',
+    'btn-inbox-text': 'Messages',
+    'btn-logout-nav': 'Log Out',
+    // Sidebar ad
+    'sidebar-ad-title': 'Ad Space',
+    'sidebar-ad-text': 'Great opportunity to reach thousands of daily readers. Contact us for a quote.',
+    'btn-sidebar-ad': 'Advertise with Us',
+    // Sidebar drawer
+    'sidebar-dashboard-title': 'My Dashboard',
+    'sidebar-text-stories': 'Stories',
+    'sidebar-text-store': 'Store',
+    'sidebar-text-graphs': 'Graphs & Data',
+    'sidebar-text-premium': 'Premium',
+    'sidebar-text-video': 'Videos',
+    'sidebar-text-mygraphs': 'My Graphs',
+    'sidebar-text-myarticles': 'My Articles',
+    'sidebar-text-mypurchases': 'My Purchases',
+    'sidebar-sponsored-title': 'Boost Productivity with AI',
+    'sidebar-sponsored-label': 'SPONSORED',
+    // Weather Widget
+    'weather-city': 'Washington',
+    'weather-temp': '16°C',
+    // Graphs & Data Page
+    'graphs-page-title': 'Graphs & Data',
+    'graphs-page-tag': 'Real-time System Analytics',
+    'graph-card-1-title': '<i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> Daily Traffic',
+    'graph-card-1-desc': '* Unique visitor traffic by days of the past week.',
+    'graph-card-2-title': '<i class="fa-solid fa-coins" style="color:#eab308;"></i> Subscription Revenue',
+    'graph-card-2-desc': '* Steady monthly revenue growth from premium subscriptions.',
+    // Video Page
+    'video-page-title': 'Videos & Live Streams',
+    'video-page-tag': 'Premium Member Content',
+    'video-mock-title': 'Review of the new Lenovo ThinkPad models for 2026',
+    'video-mock-subtitle': 'Exclusive premium video for subscribers',
+    // Customer Service Widget
+    'cs-btn-text': 'Customer Service',
+    'cs-panel-title': 'SOKI Support',
+    'cs-panel-status': 'Active Now',
+    'cs-welcome-msg': 'Hello! How can we help you today? Please choose one of the options below or write us a message.',
+    'cs-quick-1': '💳 How to subscribe to Premium?',
+    'cs-quick-2': '📸 How to upload user photos?',
+    'cs-quick-3': '👤 Chat with a support agent',
+    'cs-chat-input': 'Type a message here...',
+    // Footer Headers & Links
+    'footer-col-1-header': 'Contact Us',
+    'footer-col-1-link-1': '⭐ Monthly Subscription',
+    'footer-col-1-link-2': 'Email Support',
+    'footer-col-1-link-3': 'Call Us: +1-555-0199',
+    'footer-col-1-link-4': '<i class="fa-brands fa-paypal"></i> Donate via PayPal',
+    'footer-col-2-header': 'Information',
+    'footer-col-2-link-1': 'About Us',
+    'footer-col-2-link-2': "What's New",
+    'footer-col-3-header': 'Admin',
+    'footer-col-3-link-1': 'Admin Login',
+    'footer-col-3-link-2': 'Upload Articles',
+    'footer-copyright-text': '© 2026 SOKI Media LLC. All rights reserved.',
+  }
+};
+
+const articleTranslations = {
+  1: {
+    title: 'Lenovo Refreshes ThinkPad Series with Five New Models',
+    category: 'Laptops',
+    author: 'News Team',
+    time: 'Today, 18:30',
+    snippet: 'Lenovo introduces major updates to its professional laptop line, optimizing cooling systems, increasing screen brightness, and enhancing performance with latest AI-accelerated processors...',
+    content: `
+      <p>Lenovo has officially unveiled the newest iterations of its beloved ThinkPad professional laptop family. This refreshing update encompasses five brand-new models designed from the ground up to meet the demands of modern business professionals and software engineers.</p>
+      <p>The updated lineup places a major emphasis on cooling architectures, visual brilliance, and unprecedented performance capabilities. Each model integrates high-refresh-rate displays and is powered by state-of-the-art processors featuring dedicated AI processing units.</p>
+      <p>Additionally, Lenovo has enhanced their carbon-footprint reduction initiatives by using recycled aluminum and magnesium materials in the chassis without compromising their legendary military-grade durability.</p>
+    `
+  },
+  2: {
+    title: 'Google Introduces New Verification Protocol for Android App Installs',
+    category: 'Security',
+    author: 'News Team',
+    time: 'Today, 17:00',
+    snippet: 'Android devices will soon receive a robust background security update introducing a mandatory real-time threat analysis during application installations...',
+    content: `
+      <p>In its ongoing battle against mobile malware, Google has announced a groundbreaking security feature aimed at safeguarding millions of Android users worldwide. The new verification protocol introduces a real-time deep scan during application installations.</p>
+      <p>This scanning engine utilizes cloud-based heuristic machine learning models to detect suspicious behavioral patterns before any malicious code can execute on the host device.</p>
+      <p>The feature will roll out transparently via Google Play Services, ensuring older Android versions benefit from the same high level of protection as the newest releases.</p>
+    `
+  },
+  3: {
+    title: 'Xiaomi Watch S5 Announced: Larger Display and Up to 21 Days Battery Life',
+    category: 'Smartwatches',
+    author: 'News Team',
+    time: 'Today, 16:00',
+    snippet: 'Xiaomi unveils its premium smart wearable, featuring a high-brightness AMOLED circular screen, comprehensive health tracking metrics, and exceptional energy efficiency...',
+    content: `
+      <p>Xiaomi has officially expanded its premium smart wearable family with the launch of the Xiaomi Watch S5. The new device boasts a gorgeous circular AMOLED display with peak brightness levels reaching up to 1500 nits, ensuring complete outdoor readability.</p>
+      <p>Under the hood, a new custom dual-core chipset coupled with advanced battery optimization algorithms allows the smartwatch to achieve an astoundingly long battery life of up to 21 days on a single charge.</p>
+      <p>It also features 24/7 cardiovascular monitoring, blood-oxygen saturation sensors, sleep quality analysis, and supports over 120 professional fitness tracking activities.</p>
+    `
+  },
+  4: {
+    title: 'Google Upgrades Google AI Pro Storage to 5TB for Free',
+    category: 'Google',
+    author: 'News Team',
+    time: 'Today, 16:45',
+    snippet: 'Google upgrades AI Pro subscription storage from 2TB to 5TB. The storage increase is applied automatically without any price changes, remaining at 74.90 NIS in Israel...',
+    content: `
+      <p>In a surprising competitive maneuver, Google has announced a massive storage upgrade for all subscribers of its Google AI Pro tier. All existing and new customers will see their cloud storage capacity automatically increased from 2TB to 5TB.</p>
+      <p>Most importantly, Google has confirmed that this substantial capacity increase comes at absolutely no additional cost, keeping the subscription price locked at 74.90 NIS per month in Israel.</p>
+      <p>This strategic move is clearly intended to position Google\'s AI Pro offering as a highly lucrative option for creative professionals, developers, and researchers who generate large datasets using generative AI tools.</p>
+    `
+  },
+  5: {
+    title: 'WhatsApp Warns: 200 Users Downloaded Malicious Clone Application',
+    category: 'Security',
+    author: 'News Team',
+    time: 'Today, 15:45',
+    snippet: 'Security researchers warn that an unauthorized, modified WhatsApp clone has bypassed user security filters, actively harvesting private communication logs...',
+    content: `
+      <p>WhatsApp security analysts have released an urgent advisory after identifying a malicious, highly sophisticated WhatsApp clone operating in the wild. Initial investigations reveal that approximately 200 users have downloaded and installed this fraudulent software.</p>
+      <p>The cloned application masquerades as an official client offering advanced custom styles, but operates in the background as a spyware vector, capturing text history, media assets, and contacts list.</p>
+      <p>Users are strongly urged to only download the official WhatsApp application from trusted sources like the Apple App Store or Google Play Store and immediately uninstall any third-party modifications.</p>
+    `
+  },
+  6: {
+    title: 'Google Announces Wear OS 6.1: Standalone GPS and Upgraded Kid Accounts',
+    category: 'Google',
+    author: 'News Team',
+    time: 'Today, 12:12',
+    snippet: 'The new wearable update enhances independent navigation features and implements advanced parental controls, competing directly against Apple Watch...',
+    content: `
+      <p>Google has officially rolled out Wear OS 6.1, a significant firmware update focused on improving watch autonomy and introducing highly requested child account safety features.</p>
+      <p>With standalone GPS optimization, compatible smartwatch hardware will now be able to record highly precise route maps during outdoor jogs or cycling sessions without requiring a constant Bluetooth connection to a smartphone.</p>
+      <p>Furthermore, Google has redesigned the kids wearable experience, giving parents powerful remote tracking and scheduling tools to establish healthy digital screen habits.</p>
+    `
+  },
+  7: {
+    title: 'Nvidia Presents Auto Shader Compilation to Minimize Game Loading Lag',
+    category: 'Hardware',
+    author: 'News Team',
+    time: 'Today, 10:40',
+    snippet: 'The new real-time technology aims to completely eliminate shader pre-compilation stuttering, saving precious seconds during game startup...',
+    content: `
+      <p>Nvidia has unveiled its latest innovation in graphics rendering technology: Auto Shader Compilation. This feature is set to put an end to one of the most frustrating annoyances in modern PC gaming: shader-compilation stuttering.</p>
+      <p>By leveraging dedicated tensor cores and high-throughput background threads, the GPU compiles complex shader instructions in real-time right before they are displayed, preventing frames from dropping during intense gameplay sequences.</p>
+      <p>Nvidia confirms that developers can integrate this technology into existing DirectX 12 and Vulkan titles with minimal code changes.</p>
+    `
+  },
+  8: {
+    title: 'Telegram Introduces AI-Powered Text Editor and Enhanced Polling Tools',
+    category: 'Apps',
+    author: 'News Team',
+    time: 'Today, 09:19',
+    snippet: 'Telegram update features powerful generative AI tools to rewrite messages, dynamic live photo support, and highly configurable group poll controls...',
+    content: `
+      <p>Telegram continues to solidify its reputation as a feature-rich messaging powerhouse with its latest major update. The flagship addition is an integrated, offline-capable generative AI text editor.</p>
+      <p>This virtual writing assistant allows users to instantly change the tone of their draft messages, correct grammatical errors, summarize long threads, or translate text across 15 popular languages.</p>
+      <p>Additionally, group administrators will enjoy enhanced polling capabilities, including quiz-mode configurations and detailed breakdown statistics for transparent community voting.</p>
+    `
+  }
+};
+
+function toggleLanguage() {
+  currentLang = currentLang === 'he' ? 'en' : 'he';
+  localStorage.setItem('siteLang', currentLang);
+  applyLanguage(currentLang);
+}
+
+function applyLanguage(lang) {
+  const dict = translationDictionary[lang] || {};
+  for (const [id, value] of Object.entries(dict)) {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === 'cs-chat-input') {
+        el.placeholder = value;
+      } else {
+        el.innerHTML = value;
+      }
+    }
+  }
+
+  // Update HTML structure directions dynamically
+  if (lang === 'he') {
+    document.documentElement.dir = 'rtl';
+    document.documentElement.lang = 'he';
+  } else {
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = 'en';
+  }
+
+  // Update navbar language toggle label
+  const toggleBtnText = document.querySelector('#lang-toggle span');
+  if (toggleBtnText) {
+    toggleBtnText.textContent = lang === 'he' ? 'English' : 'עברית';
+  }
+
+  // Re-render components with newly selected language strings
+  const activePage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'home';
+  if (activePage === 'home') {
+    renderNewsLayout(currentPage);
+  } else if (activePage === 'article' && typeof currentArticleId !== 'undefined') {
+    showArticle(currentArticleId);
+  }
+}
+
+// ========== SIDEBAR CONTROL ==========
+
+function toggleSidebarCollapse() {
+  const sidebar = document.getElementById('dashboard-sidebar');
+  if (!sidebar) return;
+  sidebar.classList.toggle('collapsed');
+  
+  const icon = document.getElementById('collapse-btn-icon');
+  if (icon) {
+    if (sidebar.classList.contains('collapsed')) {
+      icon.className = 'fa-solid fa-chevron-right';
+    } else {
+      icon.className = 'fa-solid fa-chevron-left';
+    }
+  }
+}
+
+function toggleSidebarDrawer() {
+  const sidebar = document.getElementById('dashboard-sidebar');
+  if (!sidebar) return;
+  sidebar.classList.toggle('drawer-open');
+}
+
+function handleSidebarNavigation(page) {
+  // Update sidebar active highlights
+  document.querySelectorAll('.sidebar-menu-item').forEach(el => el.classList.remove('active'));
+  const activeSidebarLink = document.getElementById(`sidebar-link-${page}`);
+  if (activeSidebarLink) {
+    activeSidebarLink.classList.add('active');
+  } else if (page === 'pdf-store') {
+    const storeLink = document.getElementById('sidebar-link-store');
+    if (storeLink) storeLink.classList.add('active');
+  } else if (page === 'subscription') {
+    const premLink = document.getElementById('sidebar-link-premium');
+    if (premLink) premLink.classList.add('active');
+  }
+
+  showPage(page);
+  
+  // Close mobile drawer
+  const sidebar = document.getElementById('dashboard-sidebar');
+  if (sidebar) sidebar.classList.remove('drawer-open');
+}
+
+function handleSidebarAction(action) {
+  if (action === 'my-graphs') {
+    handleSidebarNavigation('graphs');
+    showToast(currentLang === 'en' ? 'Opening Analytics charts...' : 'פותח את גרפי הנתונים שלי...');
+  } else if (action === 'my-articles') {
+    handleSidebarNavigation('home');
+    showToast(currentLang === 'en' ? 'Showing your custom feed...' : 'מציג את הסיפורים שפרסמתי...');
+  } else if (action === 'my-purchases') {
+    openCheckoutModal();
+  }
+  
+  const sidebar = document.getElementById('dashboard-sidebar');
+  if (sidebar) sidebar.classList.remove('drawer-open');
+}
+
+// ========== CUSTOMER SERVICE CHAT PANEL ==========
+
+function toggleChatPanel() {
+  const panel = document.getElementById('customer-service-panel');
+  if (!panel) return;
+  panel.classList.toggle('cs-panel-visible');
+  panel.classList.toggle('cs-panel-hidden');
+}
+
+function hideCsWidget() {
+  const widget = document.getElementById('customer-service-widget');
+  const panel = document.getElementById('customer-service-panel');
+  if (widget) widget.style.display = 'none';
+  if (panel) {
+    panel.classList.remove('cs-panel-visible');
+    panel.classList.add('cs-panel-hidden');
+  }
+}
+
+function sendCsQuickReply(optionId) {
+  const chatBody = document.getElementById('cs-chat-body');
+  if (!chatBody) return;
+  
+  const quickReplies = document.getElementById('cs-quick-replies');
+  if (quickReplies) quickReplies.style.display = 'none';
+  
+  let userMsgText = '';
+  let agentReplyText = '';
+  
+  if (optionId === 1) {
+    userMsgText = currentLang === 'en' ? '💳 How to subscribe to Premium?' : '💳 איך מצטרפים למנוי Premium?';
+    agentReplyText = currentLang === 'en' 
+      ? 'To subscribe to our premium plan, go to the Premium page, fill out your checkout details, or click Donate via PayPal to start enjoying ad-free usage!' 
+      : 'כדי להירשם לתוכנית הפרימיום שלנו, היכנס לדף "פרימיום" בסרגל הצד, מלא את פרטי התשלום או לחץ על כפתור PayPal ותוכל ליהנות מגלישה ללא פרסומות!';
+  } else if (optionId === 2) {
+    userMsgText = currentLang === 'en' ? '📸 How to upload user photos?' : '📸 איך מעלים תמונות גולשים?';
+    agentReplyText = currentLang === 'en' 
+      ? 'Navigate to the Laptops/Store page and scroll down to "Upload User Photos". Fill out the title and description, upload up to 4 images, and press Send!' 
+      : 'עבור לדף "תמונות גולשים", גלול לחלק של "העלה תמונות גולשים", מלא את פרטי הנושא והתיאור, בחר עד 4 תמונות ולחץ על "שלח"!';
+  } else if (optionId === 3) {
+    userMsgText = currentLang === 'en' ? '👤 Chat with a support agent' : '👤 שיחה עם נציג תמיכה אנושי';
+    agentReplyText = currentLang === 'en' 
+      ? 'We are connecting you to an active support agent. Please type your detailed inquiry below, and we will reply shortly!' 
+      : 'אנו מחברים אותך כעת לנציג תמיכה פעיל. אנא הקלד את שאלתך בתיבת הטקסט למטה ונציג יענה לך בהקדם!';
+  }
+  
+  appendCsBubble(userMsgText, true);
+  showCsTypingIndicator();
+  
+  setTimeout(() => {
+    removeCsTypingIndicator();
+    appendCsBubble(agentReplyText, false);
+    
+    if (optionId !== 3) {
+      setTimeout(() => {
+        if (quickReplies) quickReplies.style.display = 'flex';
+      }, 1000);
+    }
+  }, 1200);
+}
+
+function sendCsCustomMessage() {
+  const input = document.getElementById('cs-chat-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = '';
+  appendCsBubble(text, true);
+  showCsTypingIndicator();
+  
+  setTimeout(() => {
+    removeCsTypingIndicator();
+    const replyText = currentLang === 'en'
+      ? 'Thank you for your message! Our representative will review your request and get back to you shortly.'
+      : 'תודה על פנייתך! נציג השירות שלנו יבחן את פנייתך ויחזור אליך בהקדם האפשרי.';
+    appendCsBubble(replyText, false);
+  }, 1500);
+}
+
+function appendCsBubble(text, isUser) {
+  const chatBody = document.getElementById('cs-chat-body');
+  if (!chatBody) return;
+  
+  const bubble = document.createElement('div');
+  bubble.style.maxWidth = '80%';
+  bubble.style.padding = '14px 18px';
+  bubble.style.borderRadius = isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px';
+  bubble.style.fontSize = '0.95rem';
+  bubble.style.lineHeight = '1.5';
+  bubble.style.boxShadow = '0 2px 6px rgba(0,0,0,0.02)';
+  
+  if (isUser) {
+    bubble.style.alignSelf = 'flex-end';
+    bubble.style.background = '#0071e3';
+    bubble.style.color = '#fff';
+  } else {
+    bubble.style.alignSelf = 'flex-start';
+    bubble.style.background = '#fff';
+    bubble.style.border = '1px solid var(--border-subtle)';
+    bubble.style.color = '#1d1d1f';
+  }
+  
+  bubble.innerHTML = text;
+  chatBody.appendChild(bubble);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function showCsTypingIndicator() {
+  const chatBody = document.getElementById('cs-chat-body');
+  if (!chatBody) return;
+  
+  const indicator = document.createElement('div');
+  indicator.id = 'cs-typing-indicator';
+  indicator.style.alignSelf = 'flex-start';
+  indicator.style.background = '#fff';
+  indicator.style.border = '1px solid var(--border-subtle)';
+  indicator.style.padding = '10px 18px';
+  indicator.style.borderRadius = '16px 16px 16px 4px';
+  indicator.style.color = '#86868b';
+  indicator.style.fontSize = '0.85rem';
+  indicator.style.display = 'flex';
+  indicator.style.alignItems = 'center';
+  indicator.style.gap = '4px';
+  indicator.innerHTML = '<span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span>';
+  
+  chatBody.appendChild(indicator);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function removeCsTypingIndicator() {
+  const indicator = document.getElementById('cs-typing-indicator');
+  if (indicator) indicator.remove();
+}
+
+function initBilingualAndSidebar() {
+  applyLanguage(currentLang);
+}
+
+// ========== GLOBAL SEARCH SYSTEM ==========
+
+function handleGlobalSearch(query) {
+  const dropdown = document.getElementById('global-search-results');
+  if (!dropdown) return;
+  
+  const trimmed = query.trim().toLowerCase();
+  if (!trimmed) {
+    dropdown.classList.add('hidden');
+    dropdown.innerHTML = '';
+    return;
+  }
+  
+  // 1. Filter articles
+  const matchingArticles = newsArticles.filter(a => {
+    const titleMatch = (a.title && a.title.toLowerCase().includes(trimmed));
+    const contentMatch = (a.content && a.content.toLowerCase().includes(trimmed));
+    const catMatch = (a.category && a.category.toLowerCase().includes(trimmed));
+    return titleMatch || contentMatch || catMatch;
+  });
+  
+  // 2. Filter user photos (PDF store items)
+  const pdfItems = getPdfItems();
+  const matchingPdf = pdfItems.filter(item => {
+    const titleMatch = (item.title && item.title.toLowerCase().includes(trimmed));
+    const descMatch = (item.desc && item.desc.toLowerCase().includes(trimmed));
+    const typeMatch = (item.type && item.type.toLowerCase().includes(trimmed));
+    return titleMatch || descMatch || typeMatch;
+  });
+  
+  dropdown.classList.remove('hidden');
+  
+  if (matchingArticles.length === 0 && matchingPdf.length === 0) {
+    dropdown.innerHTML = `
+      <div class="search-empty-state">
+        <i class="fa-regular fa-face-frown" style="font-size:1.8rem; margin-bottom:8px; display:block; color:var(--text-muted);"></i>
+        ${currentLang === 'en' ? 'No results found for' : 'לא נמצאו תוצאות עבור'} "<strong>${escHtml(query)}</strong>"
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  // Render Articles section
+  if (matchingArticles.length > 0) {
+    html += `
+      <div class="search-section">
+        <div class="search-section-header">
+          <i class="fa-solid fa-book-open"></i> ${currentLang === 'en' ? 'Stories & Articles' : 'סיפורים וכתבות'} (${matchingArticles.length})
+        </div>
+    `;
+    matchingArticles.forEach(a => {
+      const trans = (currentLang === 'en' && articleTranslations[a.id]) ? articleTranslations[a.id] : {};
+      const title = trans.title || a.title;
+      const snippet = trans.snippet || a.snippet || '';
+      
+      html += `
+        <div class="search-result-item" onclick="selectSearchArticle(${a.id})">
+          <div class="search-result-thumb" style="background-image: url('${a.image}')"></div>
+          <div class="search-result-info">
+            <div class="search-result-title">${escHtml(title)}</div>
+            <div class="search-result-desc">${escHtml(snippet)}</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  
+  // Render User Photos / Products section
+  if (matchingPdf.length > 0) {
+    html += `
+      <div class="search-section" style="margin-top: 8px;">
+        <div class="search-section-header">
+          <i class="fa-solid fa-camera"></i> ${currentLang === 'en' ? 'User Photos & Products' : 'תמונות גולשים וחנות'} (${matchingPdf.length})
+        </div>
+    `;
+    matchingPdf.forEach(item => {
+      const pdfItemsAll = getPdfItems();
+      const originalIndex = pdfItemsAll.findIndex(x => x.title === item.title && x.desc === item.desc);
+      const img = item.images && item.images[0] ? item.images[0] : (item.image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c');
+      
+      html += `
+        <div class="search-result-item" onclick="selectSearchProduct(${originalIndex})">
+          <div class="search-result-thumb" style="background-image: url('${img}')"></div>
+          <div class="search-result-info">
+            <div class="search-result-title">${escHtml(item.title)}</div>
+            <div class="search-result-desc">${escHtml(item.desc || '')}</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  
+  dropdown.innerHTML = html;
+}
+
+function selectSearchArticle(id) {
+  showArticle(id);
+  clearGlobalSearch();
+}
+
+function selectSearchProduct(index) {
+  showProductDetail(index);
+  clearGlobalSearch();
+}
+
+function clearGlobalSearch() {
+  const input = document.getElementById('global-search-input');
+  const dropdown = document.getElementById('global-search-results');
+  if (input) input.value = '';
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+    dropdown.innerHTML = '';
+  }
+}
+
+// Close search dropdown on click outside
+document.addEventListener('click', (e) => {
+  const searchBox = document.querySelector('.apple-search-box');
+  if (searchBox && !searchBox.contains(e.target)) {
+    const dropdown = document.getElementById('global-search-results');
+    if (dropdown) dropdown.classList.add('hidden');
+  }
+});
+
+// Execute custom systems initialization
+initBilingualAndSidebar();

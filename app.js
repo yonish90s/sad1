@@ -13,6 +13,39 @@ const defaultNewsArticles = [
 
 const defaultPdfStoreItems = [
   {
+    title: 'טרק שקיעות מרהיב בדולומיטים - איטליה',
+    contact: 'Guy_Dolomiti',
+    desc: 'סיפור דרך מלא ומסלול של 4 ימים בדולומיטים. נופים עוצרי נשימה, בקתות הרים מומלצות וטיפים לצילום שקיעה מושלמת!',
+    age: '26',
+    location: 'איטליה',
+    type: 'תוכן גולשים',
+    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '29.05.2026'
+  },
+  {
+    title: 'סיור קולינרי חלומי בסמטאות טראסטוורה - רומא',
+    contact: 'Maya_Foodie',
+    desc: 'המדריך הסודי לפיצות הכי טובות ברומא, פסטה קרבונרה אמיתית, וגלידריות שאסור לפספס. שיתוף חוויות ותמונות מעוררות תיאבון!',
+    age: '23',
+    location: 'רומא',
+    type: 'תוכן גולשים',
+    images: ['https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '29.05.2026'
+  },
+  {
+    title: 'חופים סודיים ושקיעות מוזהבות בסנטוריני - יוון',
+    contact: 'Dan_Explorer',
+    desc: 'התרחקות מהמלכודות התיירותיות: גישה למפרצים מבודדים, שבילי הליכה נסתרים ונקודות התצפית הכי יפות לשקיעה ללא קהל.',
+    age: '28',
+    location: 'יוון',
+    type: 'תוכן גולשים',
+    images: ['https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=800'],
+    price: 'חינם',
+    date: '29.05.2026'
+  },
+  {
     title: 'סופשבוע מושלם בנואבה דה צ\'יאפה - מקסיקו',
     contact: 'Ronnie_M',
     desc: 'שיתוף של תמונות ומסמכי מסלול מטיול המקסיקו המטורף שלי! נופים, מחירים והמלצות חמות.',
@@ -85,7 +118,7 @@ const defaultPdfStoreItems = [
 
 
 let storedPdfItems = localStorage.getItem('pdfStoreItems');
-if (!storedPdfItems || JSON.parse(storedPdfItems).length === 0) {
+if (!storedPdfItems || JSON.parse(storedPdfItems).length === 0 || !storedPdfItems.includes('טרק שקיעות מרהיב')) {
   localStorage.setItem('pdfStoreItems', JSON.stringify(defaultPdfStoreItems));
 }
 

@@ -1640,6 +1640,7 @@ async function submitUserPdfItem(isScheduled = false) {
         loader.style.display = 'none';
         loader.style.pointerEvents = 'none';
         showToast('✅ הפריט שלך פורסם בחנות בהצלחה!');
+        closeUploadModal();
         // Quick scroll to the new item
         document.getElementById('pdf-store-grid').scrollIntoView({ behavior: 'smooth' });
       }, 200);
@@ -2544,3 +2545,24 @@ document.addEventListener('click', (e) => {
 
 // Execute custom systems initialization
 initBilingualAndSidebar();
+
+// ========== UPLOAD PHOTO MODAL CONTROLLERS ==========
+function openUploadModal() {
+  const modal = document.getElementById('upload-photo-modal');
+  if (modal) {
+    modal.classList.add('active');
+  }
+}
+
+function closeUploadModal() {
+  const modal = document.getElementById('upload-photo-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function closeUploadModalOnOverlay(event) {
+  if (event.target.id === 'upload-photo-modal') {
+    closeUploadModal();
+  }
+}

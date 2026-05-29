@@ -3634,3 +3634,71 @@ body.dark-theme .category-chip.active {
   box-shadow: 0 4px 15px rgba(0, 113, 227, 0.45) !important;
 }
 
+/* =============================================
+   UPLOAD PHOTO DARK MODAL SYSTEM
+   ============================================= */
+.upload-modal-dark {
+  background: #1c1c1e !important;
+  color: #f5f5f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+}
+
+.upload-modal-dark label {
+  color: #86868b !important;
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+}
+
+.upload-modal-dark input[type="text"],
+.upload-modal-dark input[type="number"],
+.upload-modal-dark input[type="datetime-local"],
+.upload-modal-dark textarea,
+.upload-modal-dark select {
+  background: #2c2c2e !important;
+  color: #fff !important;
+  border: 1px solid #3a3a3c !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  font-size: 0.95rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  outline: none !important;
+  transition: border-color 0.2s !important;
+}
+
+.upload-modal-dark input:focus,
+.upload-modal-dark textarea:focus {
+  border-color: #0071e3 !important;
+}
+
+.upload-modal-dark input::placeholder,
+.upload-modal-dark textarea::placeholder {
+  color: #636366 !important;
+}
+
+.upload-modal-dark .modal-close {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.upload-modal-dark .modal-close:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Collapsible section inside dark modal */
+.upload-modal-dark .dark-modal-section {
+  background: #2c2c2e !important;
+  border: 1px solid #3a3a3c !important;
+}
+
+.upload-modal-dark .dark-modal-section input {
+  background: #1c1c1e !important;
+  border-color: #3a3a3c !important;
+}
+

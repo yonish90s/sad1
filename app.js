@@ -999,28 +999,13 @@ function renderPdfStoreGrid() {
         <!-- Thumbnail Media Image Wrapper -->
         <div class="pdf-card-media-wrapper" style="position:relative; width:100%; height:180px; overflow:hidden; background:#000;">
           <img src="${mainImg}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" />
-          <span style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.75); color:#fff; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px; letter-spacing:0.02em; backdrop-filter:blur(4px);">
-            ${duration}
-          </span>
         </div>
         
         <!-- Text/Metadata Body -->
-        <div class="pdf-card-body" style="padding:14px 14px 8px 14px; display:flex; flex-direction:column; gap:6px; flex:1; text-align:right;">
+        <div class="pdf-card-body" style="padding:14px 14px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; text-align:right;">
           <h3 style="font-size:0.95rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.35; height:2.7em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; text-overflow:ellipsis;">
             ${escHtml(item.title)}
           </h3>
-        </div>
-        
-        <!-- Interactive Footer Stats/Pill Row -->
-        <div class="pdf-card-footer" style="display:flex; justify-content:space-between; align-items:center; padding:0 14px 14px 14px; background:transparent;">
-          <div style="display:flex; align-items:center; gap:4px; color:#86868b; font-size:0.8rem; font-weight:500;">
-            <i class="fa-regular fa-eye" style="font-size:0.85rem;"></i>
-            <span>${views}</span>
-          </div>
-          
-          <button class="pdf-card-action-btn ${priceClass}" style="border:none; outline:none; border-radius:980px; padding:6px 14px; font-size:0.75rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all 0.2s;">
-            ${priceLabel}
-          </button>
         </div>
         
       </div>

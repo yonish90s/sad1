@@ -1610,16 +1610,23 @@ function renderUserPdfSlots() {
       `;
       slotEl.style.borderStyle = 'solid';
       slotEl.style.borderColor = 'rgba(255,255,255,0.2)';
+      
+      // Hide the input next to the slotEl
+      const inputEl = slotEl.nextElementSibling;
+      if (inputEl) inputEl.style.display = 'none';
     } else {
       slotEl.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #86868b; pointer-events: none;">
           <i class="fa-solid fa-camera" style="font-size: 1.2rem; color: #0071e3;"></i>
           <span style="font-size: 0.65rem; font-weight: 700;">+ תמונה ${i+1}</span>
         </div>
-        <input type="file" accept="image/*" onchange="handleUserPdfFileSelectionDirect(${i}, event)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
       `;
       slotEl.style.borderStyle = 'dashed';
       slotEl.style.borderColor = 'rgba(255,255,255,0.15)';
+      
+      // Show the input next to the slotEl
+      const inputEl = slotEl.nextElementSibling;
+      if (inputEl) inputEl.style.display = 'block';
     }
   }
 }

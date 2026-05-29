@@ -169,7 +169,10 @@ function showPage(page) {
   if (targetPage) targetPage.classList.add('active');
 
   if (page === 'home') renderNewsLayout();
-  if (page === 'pdf-store') renderPdfStoreGrid();
+  if (page === 'pdf-store') {
+    renderPdfStoreGrid();
+    renderStoreCategoryBar();
+  }
   if (page === 'subscription') window.scrollTo({ top: 0, behavior: 'smooth' });
   if (page === 'join') {
     if (currentUser) {
@@ -829,9 +832,19 @@ function savePdfItems(items) {
 function renderPdfStoreGrid() {
   const grid = document.getElementById('pdf-store-grid');
   if (!grid) return;
-  const items = getPdfItems();
+  let items = getPdfItems();
+  if (selectedStoreCategory !== 'all') {
+    items = items.filter(item => {
+      if (selectedStoreCategory === 'video') return item.type === 'סרטון';
+      if (selectedStoreCategory === 'photo') return item.type === 'תוכן גולשים' || item.type === 'קובץ';
+      if (selectedStoreCategory === 'pdf') return item.type === 'PDF';
+      if (selectedStoreCategory === 'guide') return item.type === 'מדריך';
+      if (selectedStoreCategory === 'software') return item.type === 'תוכנה';
+      return true;
+    });
+  }
   if (items.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:80px; color:#86868b; font-size:1.1rem;">אין פריטים בחנות עדיין. המנהל יוסיף בקרוב!</div>';
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:80px; color:#86868b; font-size:1.1rem;">${currentLang === 'en' ? 'No items in this category yet.' : 'אין פריטים בקטגוריה זו עדיין.'}</div>`;
     return;
   }
   
@@ -2565,4 +2578,50 @@ function closeUploadModalOnOverlay(event) {
   if (event.target.id === 'upload-photo-modal') {
     closeUploadModal();
   }
+}
+
+// ========== STORE CATEGORIES SYSTEM ==========
+let selectedStoreCategory = 'all';
+
+const storeCategoryMap = {
+  'he': {
+    'all': 'הכל 🌟',
+    'video': 'סרטונים 🎥',
+    'photo': 'תמונות 📸',
+    'pdf': 'קובצי PDF 📄',
+    'guide': 'מדריכים 📚',
+    'software': 'תוכנות 🖥️'
+  },
+  'en': {
+    'all': 'All 🌟',
+    'video': 'Videos 🎥',
+    'photo': 'Photos 📸',
+    'pdf': 'PDF Files 📄',
+    'guide': 'Guides 📚',
+    'software': 'Software 🖥️'
+  }
+};
+
+function renderStoreCategoryBar() {
+  const bar = document.getElementById('store-category-filter-bar');
+  if (!bar) return;
+  
+  const categories = ['all', 'video', 'photo', 'pdf', 'guide', 'software'];
+  const map = storeCategoryMap[currentLang] || storeCategoryMap['he'];
+  
+  bar.innerHTML = categories.map(cat => {
+    const label = map[cat] || cat;
+    const activeClass = (cat === selectedStoreCategory) ? 'active' : '';
+    return `
+      <button class="category-chip ${activeClass}" onclick="selectStoreCategory('${cat}')">
+        ${label}
+      </button>
+    `;
+  }).join('');
+}
+
+function selectStoreCategory(cat) {
+  selectedStoreCategory = cat;
+  renderStoreCategoryBar();
+  renderPdfStoreGrid();
 }

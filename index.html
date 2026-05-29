@@ -95,44 +95,43 @@
         <i class="fa-solid fa-brain sponsored-brain-icon"></i>
       </div>
       <div id="sidebar-sponsored-label" class="sponsored-tag">SPONSORED</div>
-    </div>
-
-  </div>
-</div>
-
-<!-- APPLE GLOBAL NAVBAR -->
-<header class="navbar-apple">
-  <div class="nav-inner-apple">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <button id="navbar-sidebar-toggle" onclick="toggleSidebarDrawer()" class="apple-icon-btn" style="background:none; border:none; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; margin-right: 4px; color:inherit;">
+    </div><!-- APPLE GLOBAL NAVBAR (PromptHero Elegant style) -->
+<header class="navbar-apple" style="background: #ffffff !important; border-bottom: 1px solid rgba(0,0,0,0.08) !important; box-shadow: none !important; position: sticky; top: 0; z-index: 1000; width: 100%;">
+  <div class="nav-inner-apple" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; width: 100%; box-sizing: border-box;">
+    
+    <div style="display:flex; align-items:center; gap:20px;">
+      <!-- Toggle sidebar button -->
+      <button id="navbar-sidebar-toggle" onclick="toggleSidebarDrawer()" class="apple-icon-btn" style="background:none; border:none; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; color:#1d1d1f;">
         <i class="fa-solid fa-bars-staggered"></i>
       </button>
-      <div class="apple-logo" onclick="showPage('home')" title="דף הבית">
-        <img src="logo.png" alt="לוגו" style="height: 32px; width: auto; display: block;" />
+      
+      <!-- Premium Text Logo in PromptHero style -->
+      <div onclick="showPage('home')" style="font-size: 1.6rem; font-weight: 850; letter-spacing: -0.04em; color: #000000; cursor: pointer; display: flex; align-items: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; gap: 4px;">
+        <span>Sad1</span>
       </div>
-    </div>
-    
-    <nav class="apple-nav-links">
-      <button id="nav-btn-pdf" onclick="showPage('pdf-store')" class="apple-nav-item">תמונות גולשים</button>
-      <button id="nav-btn-home" onclick="showPage('home')" class="apple-nav-item">הסיפורים</button>
 
+      <!-- Navigation items next to it in PromptHero style -->
+      <nav style="display: flex; align-items: center; gap: 20px; margin-right: 12px;" class="prompthero-nav-links">
+        <button id="nav-btn-pdf" onclick="showPage('pdf-store')" style="background:none; border:none; color:#707075; font-weight:650; font-size:0.92rem; cursor:pointer; padding:8px 0; transition:color 0.2s; font-family: inherit;">תמונות גולשים</button>
+        <button id="nav-btn-home" onclick="showPage('home')" style="background:none; border:none; color:#707075; font-weight:650; font-size:0.92rem; cursor:pointer; padding:8px 0; transition:color 0.2s; font-family: inherit;">הסיפורים</button>
+      </nav>
+    </div>
+
+    <!-- Center/Right Search Box and English/Logout Actions -->
+    <div style="display: flex; align-items: center; gap: 16px;">
       <!-- Apple Search Box -->
-      <div class="apple-search-box">
-        <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="חפש כתבות ותמונות..." autocomplete="off">
-        <i class="fa-solid fa-magnifying-glass"></i>
+      <div class="apple-search-box" style="background: rgba(0,0,0,0.04) !important; border: 1px solid rgba(0,0,0,0.06) !important; color: #1d1d1f !important; height: 38px; border-radius: 20px; width: 220px; display: flex; align-items: center; padding: 0 14px; position: relative;">
+        <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="חפש כתבות ותמונות..." autocomplete="off" style="color: #1d1d1f !important; background: transparent; border: none; outline: none; width: 100%; font-size: 0.85rem; font-family: inherit;">
+        <i class="fa-solid fa-magnifying-glass" style="color: #707075 !important; font-size: 0.9rem; margin-right: 8px;"></i>
         <div id="global-search-results" class="search-results-dropdown hidden"></div>
       </div>
 
-      <button id="lang-toggle" onclick="toggleLanguage()" class="apple-nav-item" style="background:rgba(0,113,227,0.08); color:var(--primary); border: 1px solid rgba(0,113,227,0.15); font-weight:600; padding:6px 12px; border-radius:980px; display:inline-flex; align-items:center; gap:6px; font-size:11.5px; transition:all 0.2s; cursor:pointer; margin-right:8px;">
+      <button id="lang-toggle" onclick="toggleLanguage()" class="apple-nav-item" style="background: rgba(0,113,227,0.06); color: #0071e3; border: 1px solid rgba(0,113,227,0.1); font-weight: 700; padding: 7px 14px; border-radius: 980px; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; transition: all 0.2s; cursor: pointer; font-family: inherit;">
         <i class="fa-solid fa-globe"></i> <span>English</span>
       </button>
 
-      <button id="theme-toggle" onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-right:16px; padding:8px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.3s; width:40px; height:40px;">🌓</button>
-      
       <!-- User Account Section -->
-      <div id="user-nav-section" style="margin-right: 12px; display: flex; align-items: center;">
-        <button id="nav-btn-sub" class="btn-orange" onclick="showPage('subscription')" style="cursor: pointer; position: relative; z-index: 1001;">💳 מנוי חודשי</button>
-        <button id="btn-join" class="btn-primary" onclick="showPage('join')" style="font-size: 0.75rem; padding: 6px 16px; height: 30px; min-height: 0;">✨ הצטרף</button>
+      <div id="user-nav-section" style="display: flex; align-items: center;">
         <button id="btn-inbox-nav" onclick="showInboxPage()" style="display: none; padding: 6px 16px; height: 32px; border-radius: 980px; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border-subtle); cursor: pointer; color: #1d1d1f; font-weight: 600; font-size: 0.85rem; margin-left: 8px;">
           <i class="fa-regular fa-comment-dots"></i> <span id="btn-inbox-text">הודעות</span>
           <span id="inbox-unread-badge" style="display:none; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; justify-content: center; align-items: center;"></span>
@@ -143,7 +142,8 @@
         </div>
         <button id="btn-logout-nav" class="btn-secondary" onclick="logoutUser()" style="display: none; font-size: 0.75rem; padding: 6px 12px; height: 30px; margin-right: 8px; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); background: transparent;">התנתק</button>
       </div>
-    </nav>
+    </div>
+    
   </div>
 </header>
 

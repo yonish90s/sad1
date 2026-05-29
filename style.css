@@ -3691,14 +3691,27 @@ body.dark-theme .category-chip.active {
   transform: scale(1.05) !important;
 }
 
-/* Collapsible section inside dark modal */
-.upload-modal-dark .dark-modal-section {
-  background: #2c2c2e !important;
-  border: 1px solid #3a3a3c !important;
-}
-
 .upload-modal-dark .dark-modal-section input {
   background: #1c1c1e !important;
   border-color: #3a3a3c !important;
+}
+
+/* PromptHero Symmetrical Text Navigation Links Hover styling */
+.prompthero-nav-links button {
+  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease !important;
+}
+
+.prompthero-nav-links button:hover {
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+.prompthero-nav-links button:active {
+  transform: translateY(0);
+}
+
+/* For active page tracking */
+.prompthero-nav-links button.active-page {
+  color: #0071e3 !important;
 }
 

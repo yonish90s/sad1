@@ -1063,51 +1063,51 @@ function renderPdfStoreGrid() {
   const durationArray = ['03:51', '05:59', '08:14', '04:22', '06:45', '10:05'];
   
   grid.innerHTML = items.map((item, i) => {
-    // Generate beautiful initials avatar with high-end matching palette
     const contactName = item.contact || 'User';
-    const userIndex = Math.abs(contactName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % userColors.length;
-    const avatarBg = userColors[userIndex];
-    const initials = contactName.charAt(0).toUpperCase();
     
-    // Set fallback abstract premium image if missing
+    // Set fallback image
     const cidMap = { 'PDF': '1544716278-ca5e3f4abd8c', 'תוכנה': '1517694712202-14dd9538aa97', 'סרטון': '1492724441997-5dc865305da7', 'קובץ': '1544391490-01c6db9f5a70', 'מדריך': '1497633762265-9d179a990aa6' };
     const cid = cidMap[item.type] || cidMap['PDF'];
     const fallback = `https://images.unsplash.com/photo-${cid}?auto=format&fit=crop&q=80&w=800`;
     const mainImg = (item.images && item.images.length > 0) ? item.images[0] : fallback;
-    
-    const views = viewsArray[i % viewsArray.length];
-    const duration = durationArray[i % durationArray.length];
-    
-    // Format dynamic price pill
-    const isFree = !item.price || item.price === 'חינם' || parseFloat(item.price) === 0;
-    const priceClass = isFree ? 'price-free' : 'price-paid';
-    const priceLabel = isFree 
-      ? `${currentLang === 'en' ? 'FREE' : 'חינם'} <i class="fa-solid fa-play" style="font-size:0.7rem; margin-left:4px;"></i>` 
-      : `₪${item.price} <i class="fa-solid fa-cart-shopping" style="font-size:0.7rem; margin-left:4px;"></i>`;
+    const desc = item.desc || '';
+    const timeStr = item.date || 'היום';
     
     return `
-      <div class="pdf-card" onclick="showProductDetail(${i})" style="display:flex; flex-direction:column; align-items:stretch; gap:0; overflow:hidden; border-radius:20px; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+      <div class="pdf-card" style="display:flex; flex-direction:column; align-items:stretch; gap:0; overflow:hidden; border-radius:20px; transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor:pointer;">
         
-        <!-- User Profile Header -->
-        <div class="pdf-card-header" style="display:flex; align-items:center; gap:10px; padding:12px; border-bottom:1px solid var(--border-subtle); background:transparent; text-align:right;">
-          <div style="width:28px; height:28px; border-radius:50%; background:${avatarBg}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-            ${initials}
-          </div>
-          <div style="display:flex; flex-direction:column; text-align:right;">
-            <span style="font-weight:800; font-size:0.82rem; color:var(--text-main); line-height:1.2;">${escHtml(contactName)}</span>
-          </div>
+        <!-- Large Image -->
+        <div onclick="showProductDetail(${i})" class="pdf-card-media-wrapper" style="position:relative; width:100%; height:280px; overflow:hidden; background:#000; border-radius:16px;">
+          <img src="${mainImg}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" />
         </div>
         
-        <!-- Thumbnail Media Image Wrapper -->
-        <div class="pdf-card-media-wrapper" style="position:relative; width:100%; height:180px; overflow:hidden; background:#000;">
-          <img src="${mainImg}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" />
-        </div>
-        
-        <!-- Text/Metadata Body -->
-        <div class="pdf-card-body" style="padding:14px 14px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; text-align:right;">
-          <h3 style="font-size:0.95rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.35; height:2.7em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; text-overflow:ellipsis;">
+        <!-- Title -->
+        <div style="padding:16px 4px 0 4px; text-align:right;">
+          <h3 onclick="showProductDetail(${i})" style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">
             ${escHtml(item.title)}
           </h3>
+        </div>
+
+        <!-- Author + Time -->
+        <div style="padding:8px 4px 0 4px; display:flex; align-items:center; gap:8px; justify-content:flex-end; direction:rtl;">
+          <span style="font-weight:700; font-size:0.88rem; color:#0071e3;">${escHtml(contactName)}</span>
+          <span style="color:var(--text-muted); font-size:0.82rem;">|</span>
+          <span style="color:var(--text-muted); font-size:0.82rem;">${escHtml(timeStr)}</span>
+        </div>
+
+        <!-- Description snippet -->
+        <div onclick="showProductDetail(${i})" style="padding:10px 4px 0 4px; text-align:right;">
+          <p style="font-size:0.92rem; line-height:1.6; color:var(--text-muted); margin:0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">
+            ${escHtml(desc)}
+          </p>
+        </div>
+
+        <!-- Send Message Button -->
+        <div style="padding:14px 4px 4px 4px; display:flex; justify-content:flex-end;">
+          <button onclick="event.stopPropagation(); openChatWith('${escHtml(contactName)}')" style="padding:8px 20px; border-radius:980px; background:#1d1d1f; color:#fff; border:none; font-weight:700; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; font-family:inherit;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1d1d1f'">
+            <i class="fa-solid fa-message" style="font-size:0.75rem;"></i>
+            שלח הודעה
+          </button>
         </div>
         
       </div>

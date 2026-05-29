@@ -1275,8 +1275,8 @@ body {
 /* ========== PDF STORE GRID ========== */
 .pdf-store-grid {
   display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 24px !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 32px !important;
   padding: 0 0 60px 0 !important;
   margin-top: 24px !important;
 }
